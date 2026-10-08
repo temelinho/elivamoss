@@ -660,6 +660,35 @@ p {
   z-index: 1;
 }
 
+/* SES KONTROL BUTONU (MOSS SOUND TOGGLE) */
+.moss-sound-toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(14, 25, 19, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(176, 141, 87, 0.45);
+  color: var(--color-accent-champagne);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 12;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+.moss-sound-toggle:hover {
+  background: rgba(176, 141, 87, 0.28);
+  border-color: var(--color-accent-brass);
+  color: #FFFFFF;
+  transform: scale(1.08);
+}
+
 /* İPUCU ROZETİ (FLOATING HINT BADGE) */
 .moss-hint-badge {
   position: absolute;

@@ -280,6 +280,116 @@
       }
     }
 
+    // --- LÜKS VE DERİN BAS SES & HAPTİK TİTREŞİM MOTORU ---
+    let audioCtx = null;
+    let audioBuffer = null;
+    let isAudioMuted = false;
+    let lastSoundPlayTime = 0;
+    let lastSoundX = 0;
+    let lastSoundY = 0;
+
+    const soundToggleBtn = document.getElementById('moss-sound-toggle');
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      if (!audioBuffer && audioCtx) {
+        fetch('assets/audio/moss-touch.wav')
+          .then(res => res.arrayBuffer())
+          .then(buf => audioCtx.decodeAudioData(buf))
+          .then(decoded => { audioBuffer = decoded; })
+          .catch(() => {});
+      }
+    }
+
+    if (soundToggleBtn) {
+      soundToggleBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        isAudioMuted = !isAudioMuted;
+        const iconOn = soundToggleBtn.querySelector('.icon-sound-on');
+        const iconOff = soundToggleBtn.querySelector('.icon-sound-off');
+        if (iconOn && iconOff) {
+          iconOn.style.display = isAudioMuted ? 'none' : 'block';
+          iconOff.style.display = isAudioMuted ? 'block' : 'none';
+        }
+        soundToggleBtn.setAttribute('title', isAudioMuted ? 'Ses Kapalı' : 'Ses Açık');
+        if (!isAudioMuted) {
+          playMossTouchSound(0.9);
+        }
+      });
+    }
+
+    // Telefon titreşim desteği (Haptic Feedback)
+    function triggerHaptic(duration = 22) {
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        try {
+          navigator.vibrate(duration);
+        } catch (e) {}
+      }
+    }
+
+    // Tok, derinden gelen lüks bas dokunma sesi
+    function playMossTouchSound(intensity = 1.0, isLight = false) {
+      if (isAudioMuted) return;
+
+      const nowTime = performance.now();
+      if (nowTime - lastSoundPlayTime < (isLight ? 130 : 90)) return;
+      lastSoundPlayTime = nowTime;
+
+      initAudioContext();
+      triggerHaptic(isLight ? 15 : 24);
+
+      if (!audioCtx) return;
+
+      if (audioBuffer) {
+        // Gerçek stüdyo 16-bit PCM bas kaydını çal
+        const source = audioCtx.createBufferSource();
+        source.buffer = audioBuffer;
+        // Mikro perde değişimi: her dokunuşta organik farklılık
+        source.playbackRate.value = 0.95 + Math.random() * 0.08;
+
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.value = Math.min(1.0, (isLight ? 0.38 : 0.70) * intensity);
+
+        source.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        source.start(0);
+      } else {
+        // Web Audio API Canlı Sub-Bas Sentezleyici
+        const ctxNow = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const filter = audioCtx.createBiquadFilter();
+
+        // Derin sub-bas alçak geçiren filtre (Tokluk ve titreşim hissi verir)
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(140, ctxNow);
+
+        osc.type = 'sine';
+        const baseFreq = isLight ? 90 : 80;
+        osc.frequency.setValueAtTime(baseFreq + Math.random() * 8, ctxNow);
+        osc.frequency.exponentialRampToValueAtTime(34, ctxNow + 0.15);
+
+        gain.gain.setValueAtTime(0.001, ctxNow);
+        gain.gain.linearRampToValueAtTime((isLight ? 0.42 : 0.78) * intensity, ctxNow + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctxNow + 0.17);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(ctxNow);
+        osc.stop(ctxNow + 0.19);
+      }
+    }
+
     // --- FARE / DESKTOP ETKİLEŞİMLERİ ---
     container.addEventListener('mouseenter', function (e) {
       isInteracting = true;
@@ -291,6 +401,8 @@
       targetTouchY = uv.y;
       lastEventX = e.clientX;
       lastEventY = e.clientY;
+      lastSoundX = e.clientX;
+      lastSoundY = e.clientY;
     });
 
     container.addEventListener('mousemove', function (e) {
@@ -304,6 +416,14 @@
       // Anlık parmak/fare hızı (Sarmal birikim yapmaz, doğrudan yönü yansıtır)
       targetVelX = Math.max(-0.35, Math.min(0.35, dx * 1.2));
       targetVelY = Math.max(-0.35, Math.min(0.35, dy * 1.2));
+
+      // Sürüklerken yosun öbekleri üzerinde yumuşak dokunma tıkırtısı
+      const moveDist = Math.hypot(e.clientX - lastSoundX, e.clientY - lastSoundY);
+      if (moveDist > 48) {
+        playMossTouchSound(0.65, true);
+        lastSoundX = e.clientX;
+        lastSoundY = e.clientY;
+      }
 
       lastEventX = e.clientX;
       lastEventY = e.clientY;
@@ -319,6 +439,9 @@
       targetBulge = 1.75; // Tıklayınca ekstra dolgun doğal kabarma!
       userHasInteracted = true;
       lastUserInteractionTime = performance.now();
+      lastSoundX = e.clientX;
+      lastSoundY = e.clientY;
+      playMossTouchSound(1.0, false);
       hideBadge();
     });
 
@@ -348,11 +471,15 @@
 
         lastEventX = touch.clientX;
         lastEventY = touch.clientY;
+        lastSoundX = touch.clientX;
+        lastSoundY = touch.clientY;
 
         isInteracting = true;
         userHasInteracted = true;
         lastUserInteractionTime = performance.now();
         targetBulge = 1.65; // Dokununca imlecin ucu hemen pofudukça kabarsın!
+
+        playMossTouchSound(1.0, false);
         hideBadge();
       }
     }, { passive: true });
@@ -367,9 +494,17 @@
         const dx = (touch.clientX - lastEventX) / (canvas.clientWidth || 300);
         const dy = (touch.clientY - lastEventY) / (canvas.clientHeight || 300);
 
-        // Anlık sürükleme yönü (Sarmal dönme yapmaz, temiz doğrusal meyil)
+        // Anlık sürükleme yönü
         targetVelX = Math.max(-0.4, Math.min(0.4, dx * 1.5));
         targetVelY = Math.max(-0.4, Math.min(0.4, dy * 1.5));
+
+        // Parmağı gezdirirken yosun topaklarında yumuşak dokunma hissi
+        const moveDist = Math.hypot(touch.clientX - lastSoundX, touch.clientY - lastSoundY);
+        if (moveDist > 42) {
+          playMossTouchSound(0.70, true);
+          lastSoundX = touch.clientX;
+          lastSoundY = touch.clientY;
+        }
 
         lastEventX = touch.clientX;
         lastEventY = touch.clientY;
@@ -377,7 +512,7 @@
         isInteracting = true;
         userHasInteracted = true;
         lastUserInteractionTime = performance.now();
-        targetBulge = 1.45; // Sürüklerken parmağın altında pofuduk kabarma
+        targetBulge = 1.45;
         hideBadge();
       }
     }, { passive: true });
