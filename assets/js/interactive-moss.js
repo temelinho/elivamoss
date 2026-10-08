@@ -280,32 +280,67 @@
       }
     }
 
-    // --- LÜKS VE DERİN BAS SES & HAPTİK TİTREŞİM MOTORU ---
+    // --- KESİNTİSİZ LÜKS İNTERAKTİF SYNTH & DERİN BAS MOTORU (CONTINUOUS TACTILE RESONANCE) ---
     let audioCtx = null;
-    let audioBuffer = null;
+    let oscSub = null;
+    let oscWarm = null;
+    let filterNode = null;
+    let masterGain = null;
+    let isSynthRunning = false;
     let isAudioMuted = false;
-    let lastSoundPlayTime = 0;
-    let lastSoundX = 0;
-    let lastSoundY = 0;
+    let lastHapticTime = 0;
 
     const soundToggleBtn = document.getElementById('moss-sound-toggle');
 
-    function initAudioContext() {
-      if (!audioCtx) {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (AudioContextClass) {
-          audioCtx = new AudioContextClass();
+    function initContinuousSynth() {
+      if (isSynthRunning) return;
+
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+
+      try {
+        audioCtx = new AudioContextClass();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
         }
-      }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-      if (!audioBuffer && audioCtx) {
-        fetch('assets/audio/moss-touch.wav')
-          .then(res => res.arrayBuffer())
-          .then(buf => audioCtx.decodeAudioData(buf))
-          .then(decoded => { audioBuffer = decoded; })
-          .catch(() => {});
+
+        const now = audioCtx.currentTime;
+
+        // 1. Master Gain (Sıfırdan başlar, pürüzsüz açılıp kapanır, asla aç-kapa patlaması yapmaz)
+        masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(0.0001, now);
+
+        // 2. Analog Sıcak Düşük Geçiren Filtre (Moog Lowpass tınısı)
+        filterNode = audioCtx.createBiquadFilter();
+        filterNode.type = 'lowpass';
+        filterNode.frequency.setValueAtTime(130, now);
+        filterNode.Q.setValueAtTime(2.2, now); // Lüks hafif rezonans tokluğu
+
+        // 3. Sub-Bass Temel Dalga (Derin 50-75 Hz sinüs dalgası)
+        oscSub = audioCtx.createOscillator();
+        oscSub.type = 'sine';
+        oscSub.frequency.setValueAtTime(56, now);
+
+        // 4. Sıcak Harmonik Dalga (Zengin üçgen dalga - oktav üstü)
+        oscWarm = audioCtx.createOscillator();
+        oscWarm.type = 'triangle';
+        oscWarm.frequency.setValueAtTime(112, now);
+
+        const warmGain = audioCtx.createGain();
+        warmGain.gain.setValueAtTime(0.32, now);
+
+        // Bağlantılar: osilatörler -> filtre -> master gain -> çıkış
+        oscSub.connect(filterNode);
+        oscWarm.connect(warmGain);
+        warmGain.connect(filterNode);
+        filterNode.connect(masterGain);
+        masterGain.connect(audioCtx.destination);
+
+        oscSub.start(now);
+        oscWarm.start(now);
+        isSynthRunning = true;
+      } catch (err) {
+        console.warn('AudioContext başlatma uyarısı:', err);
       }
     }
 
@@ -320,14 +355,16 @@
           iconOff.style.display = isAudioMuted ? 'block' : 'none';
         }
         soundToggleBtn.setAttribute('title', isAudioMuted ? 'Ses Kapalı' : 'Ses Açık');
-        if (!isAudioMuted) {
-          playMossTouchSound(0.9);
+        if (isAudioMuted && masterGain && audioCtx) {
+          masterGain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.05);
+        } else if (!isAudioMuted) {
+          initContinuousSynth();
         }
       });
     }
 
     // Telefon titreşim desteği (Haptic Feedback)
-    function triggerHaptic(duration = 22) {
+    function triggerHaptic(duration = 20) {
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
         try {
           navigator.vibrate(duration);
@@ -335,58 +372,32 @@
       }
     }
 
-    // Tok, derinden gelen lüks bas dokunma sesi
-    function playMossTouchSound(intensity = 1.0, isLight = false) {
-      if (isAudioMuted) return;
+    // Kesintisiz analog bas synth sesini 60 FPS pürüzsüzce güncelle
+    function updateContinuousAudio(active, x, y, bulge, speed) {
+      if (isAudioMuted || !isSynthRunning || !audioCtx) return;
 
-      const nowTime = performance.now();
-      if (nowTime - lastSoundPlayTime < (isLight ? 130 : 90)) return;
-      lastSoundPlayTime = nowTime;
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
 
-      initAudioContext();
-      triggerHaptic(isLight ? 15 : 24);
+      const now = audioCtx.currentTime;
 
-      if (!audioCtx) return;
+      if (active) {
+        // Dokunulduğunda ses kesintisizce pürüzsüz açılır (Asla aç-kapa çıtırtısı yapmaz)
+        const targetVol = Math.min(0.55, 0.28 + bulge * 0.14 + speed * 0.22);
+        masterGain.gain.setTargetAtTime(targetVol, now, 0.07);
 
-      if (audioBuffer) {
-        // Gerçek stüdyo 16-bit PCM bas kaydını çal
-        const source = audioCtx.createBufferSource();
-        source.buffer = audioBuffer;
-        // Mikro perde değişimi: her dokunuşta organik farklılık
-        source.playbackRate.value = 0.95 + Math.random() * 0.08;
+        // X pozisyonuna göre pürüzsüz perde süzülmesi (50 Hz - 78 Hz derin bas aralığı)
+        const targetFreq = 52.0 + x * 26.0;
+        oscSub.frequency.setTargetAtTime(targetFreq, now, 0.06);
+        oscWarm.frequency.setTargetAtTime(targetFreq * 2.0, now, 0.06);
 
-        const gainNode = audioCtx.createGain();
-        gainNode.gain.value = Math.min(1.0, (isLight ? 0.38 : 0.70) * intensity);
-
-        source.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        source.start(0);
+        // Y pozisyonu, hareket hızı ve kabarmaya göre filtre açıklığı (100 Hz - 280 Hz)
+        const targetCutoff = 105.0 + (1.0 - y) * 105.0 + bulge * 65.0 + speed * 140.0;
+        filterNode.frequency.setTargetAtTime(targetCutoff, now, 0.07);
       } else {
-        // Web Audio API Canlı Sub-Bas Sentezleyici
-        const ctxNow = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        const filter = audioCtx.createBiquadFilter();
-
-        // Derin sub-bas alçak geçiren filtre (Tokluk ve titreşim hissi verir)
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(140, ctxNow);
-
-        osc.type = 'sine';
-        const baseFreq = isLight ? 90 : 80;
-        osc.frequency.setValueAtTime(baseFreq + Math.random() * 8, ctxNow);
-        osc.frequency.exponentialRampToValueAtTime(34, ctxNow + 0.15);
-
-        gain.gain.setValueAtTime(0.001, ctxNow);
-        gain.gain.linearRampToValueAtTime((isLight ? 0.42 : 0.78) * intensity, ctxNow + 0.005);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctxNow + 0.17);
-
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.start(ctxNow);
-        osc.stop(ctxNow + 0.19);
+        // Bırakıldığında ses aniden kesilmez; ipeksi, kadife bir sönümlemeyle erir (Release)
+        masterGain.gain.setTargetAtTime(0.0001, now, 0.24);
       }
     }
 
@@ -395,14 +406,13 @@
       isInteracting = true;
       userHasInteracted = true;
       lastUserInteractionTime = performance.now();
+      initContinuousSynth();
       targetBulge = 0.85;
       const uv = getUV(e.clientX, e.clientY);
       targetTouchX = uv.x;
       targetTouchY = uv.y;
       lastEventX = e.clientX;
       lastEventY = e.clientY;
-      lastSoundX = e.clientX;
-      lastSoundY = e.clientY;
     });
 
     container.addEventListener('mousemove', function (e) {
@@ -413,17 +423,8 @@
       const dx = (e.clientX - lastEventX) / (canvas.clientWidth || 400);
       const dy = (e.clientY - lastEventY) / (canvas.clientHeight || 400);
 
-      // Anlık parmak/fare hızı (Sarmal birikim yapmaz, doğrudan yönü yansıtır)
       targetVelX = Math.max(-0.35, Math.min(0.35, dx * 1.2));
       targetVelY = Math.max(-0.35, Math.min(0.35, dy * 1.2));
-
-      // Sürüklerken yosun öbekleri üzerinde yumuşak dokunma tıkırtısı
-      const moveDist = Math.hypot(e.clientX - lastSoundX, e.clientY - lastSoundY);
-      if (moveDist > 48) {
-        playMossTouchSound(0.65, true);
-        lastSoundX = e.clientX;
-        lastSoundY = e.clientY;
-      }
 
       lastEventX = e.clientX;
       lastEventY = e.clientY;
@@ -431,17 +432,16 @@
       isInteracting = true;
       userHasInteracted = true;
       lastUserInteractionTime = performance.now();
-      targetBulge = 1.35; // İmlecin ucu doğal şekilde kabarır
+      targetBulge = 1.35;
       hideBadge();
     });
 
     container.addEventListener('mousedown', function (e) {
-      targetBulge = 1.75; // Tıklayınca ekstra dolgun doğal kabarma!
+      initContinuousSynth();
+      targetBulge = 1.75;
       userHasInteracted = true;
       lastUserInteractionTime = performance.now();
-      lastSoundX = e.clientX;
-      lastSoundY = e.clientY;
-      playMossTouchSound(1.0, false);
+      triggerHaptic(24);
       hideBadge();
     });
 
@@ -461,6 +461,7 @@
 
     // --- MOBİL DOKUNMATİK (TOUCH) ETKİLEŞİMLERİ ---
     container.addEventListener('touchstart', function (e) {
+      initContinuousSynth();
       if (e.touches.length > 0) {
         const touch = e.touches[0];
         const uv = getUV(touch.clientX, touch.clientY);
@@ -471,15 +472,13 @@
 
         lastEventX = touch.clientX;
         lastEventY = touch.clientY;
-        lastSoundX = touch.clientX;
-        lastSoundY = touch.clientY;
 
         isInteracting = true;
         userHasInteracted = true;
         lastUserInteractionTime = performance.now();
-        targetBulge = 1.65; // Dokununca imlecin ucu hemen pofudukça kabarsın!
+        targetBulge = 1.65;
 
-        playMossTouchSound(1.0, false);
+        triggerHaptic(22);
         hideBadge();
       }
     }, { passive: true });
@@ -494,16 +493,14 @@
         const dx = (touch.clientX - lastEventX) / (canvas.clientWidth || 300);
         const dy = (touch.clientY - lastEventY) / (canvas.clientHeight || 300);
 
-        // Anlık sürükleme yönü
         targetVelX = Math.max(-0.4, Math.min(0.4, dx * 1.5));
         targetVelY = Math.max(-0.4, Math.min(0.4, dy * 1.5));
 
-        // Parmağı gezdirirken yosun topaklarında yumuşak dokunma hissi
-        const moveDist = Math.hypot(touch.clientX - lastSoundX, touch.clientY - lastSoundY);
-        if (moveDist > 42) {
-          playMossTouchSound(0.70, true);
-          lastSoundX = touch.clientX;
-          lastSoundY = touch.clientY;
+        // Hızlı sürüklerken mikro haptik titreşim hissi
+        const now = performance.now();
+        if (now - lastHapticTime > 120 && Math.hypot(dx, dy) > 0.02) {
+          triggerHaptic(14);
+          lastHapticTime = now;
         }
 
         lastEventX = touch.clientX;
@@ -544,15 +541,12 @@
       const shouldAutoPlay = !isInteracting && (!userHasInteracted || timeSinceUser > 2400);
 
       if (shouldAutoPlay) {
-        // %50 daha geniş rota: Tüm panonun top yosunları üzerinde belirgin gezinir
         const t = elapsedSeconds * 1.6;
         targetTouchX = 0.50 + Math.sin(t * 1.2) * 0.28;
         targetTouchY = 0.50 + Math.cos(t * 1.8) * 0.24;
 
-        // %50 daha güçlü kabarma dalgası (1.1 - 1.8 arası belirgin kabarma)
         targetBulge = 1.45 + Math.sin(t * 3.0) * 0.50;
 
-        // Yumuşak doğal meyil
         targetVelX = Math.cos(t * 1.2) * 0.28 * 0.35;
         targetVelY = -Math.sin(t * 1.8) * 0.24 * 0.35;
       }
@@ -571,6 +565,10 @@
       currentVelY += (targetVelY - currentVelY) * 0.25;
       targetVelX *= 0.86;
       targetVelY *= 0.86;
+
+      // 4. Kesintisiz Analog Bas Sesini Güncelle (60 FPS kesintisiz süzülme, sıfır aç-kapa)
+      const currentSpeed = Math.hypot(currentVelX, currentVelY);
+      updateContinuousAudio(isInteracting, touchX, touchY, currentBulge, currentSpeed);
 
       // Boyut kontrolü
       resizeCanvas();
