@@ -239,6 +239,8 @@
     let currentVelY = 0.0;
 
     let isInteracting = false;
+    let userHasInteracted = false;
+    let lastUserInteractionTime = 0;
     let lastEventX = 0;
     let lastEventY = 0;
 
@@ -284,7 +286,9 @@
     // --- FARE / DESKTOP ETKİLEŞİMLERİ ---
     container.addEventListener('mouseenter', function (e) {
       isInteracting = true;
-      targetBulge = 0.75;
+      userHasInteracted = true;
+      lastUserInteractionTime = performance.now();
+      targetBulge = 0.85;
       const uv = getUV(e.clientX, e.clientY);
       targetTouchX = uv.x;
       targetTouchY = uv.y;
@@ -300,40 +304,41 @@
       const dx = (e.clientX - lastEventX) / (canvas.clientWidth || 400);
       const dy = (e.clientY - lastEventY) / (canvas.clientHeight || 400);
 
-      // Yönelme kuvvetini artır
       targetVelX = Math.max(-0.6, Math.min(0.6, targetVelX + dx * 1.6));
       targetVelY = Math.max(-0.6, Math.min(0.6, targetVelY + dy * 1.6));
 
       lastEventX = e.clientX;
       lastEventY = e.clientY;
 
-      if (!isInteracting) {
-        isInteracting = true;
-        targetBulge = 0.85;
-      }
+      isInteracting = true;
+      userHasInteracted = true;
+      lastUserInteractionTime = performance.now();
+      targetBulge = 0.95;
       hideBadge();
     });
 
     container.addEventListener('mousedown', function (e) {
-      targetBulge = 1.35; // Tıklayınca ekstra yüksek kabarma!
+      targetBulge = 1.45; // Tıklayınca ekstra yüksek kabarma!
+      userHasInteracted = true;
+      lastUserInteractionTime = performance.now();
       hideBadge();
     });
 
     window.addEventListener('mouseup', function () {
       if (isInteracting) {
-        targetBulge = 0.75;
+        targetBulge = 0.85;
       }
     });
 
     container.addEventListener('mouseleave', function () {
       isInteracting = false;
+      lastUserInteractionTime = performance.now();
       targetBulge = 0.0;
       targetVelX = 0.0;
       targetVelY = 0.0;
     });
 
     // --- MOBİL DOKUNMATİK (TOUCH) ETKİLEŞİMLERİ ---
-    // Mobilde hem akıcı kabarma hem de pürüzsüz kaydırma sağlar
     container.addEventListener('touchstart', function (e) {
       if (e.touches.length > 0) {
         const touch = e.touches[0];
@@ -347,7 +352,9 @@
         lastEventY = touch.clientY;
 
         isInteracting = true;
-        targetBulge = 1.25; // Dokununca hemen pofudukça kabarsın!
+        userHasInteracted = true;
+        lastUserInteractionTime = performance.now();
+        targetBulge = 1.35; // Dokununca hemen pofudukça kabarsın!
         hideBadge();
       }
     }, { passive: true });
@@ -368,20 +375,26 @@
 
         lastEventX = touch.clientX;
         lastEventY = touch.clientY;
-        targetBulge = 1.15;
+
+        isInteracting = true;
+        userHasInteracted = true;
+        lastUserInteractionTime = performance.now();
+        targetBulge = 1.25;
         hideBadge();
       }
     }, { passive: true });
 
     container.addEventListener('touchend', function () {
       isInteracting = false;
-      targetBulge = 0.0; // Bırakınca yay fiziğiyle pofudukça eski haline döner
+      lastUserInteractionTime = performance.now();
+      targetBulge = 0.0;
       targetVelX = 0.0;
       targetVelY = 0.0;
     }, { passive: true });
 
     container.addEventListener('touchcancel', function () {
       isInteracting = false;
+      lastUserInteractionTime = performance.now();
       targetBulge = 0.0;
       targetVelX = 0.0;
       targetVelY = 0.0;
@@ -392,6 +405,26 @@
 
     function render(currentTime) {
       const elapsedSeconds = (currentTime - startTime) * 0.001;
+
+      // 0. KULLANICI DOKUNMADIĞINDA OTOMATİK CANLI GÖSTERİM (AUTO-DEMO)
+      // Sayfa açıldığında yosunlar kendi kendine kabararak ve sağa sola yatarak
+      // kullanıcının dikkatini çeker ("Bu canlı/dokunsal bir şey!" mesajı verir)
+      const timeSinceUser = currentTime - lastUserInteractionTime;
+      const shouldAutoPlay = !isInteracting && (!userHasInteracted || timeSinceUser > 2600);
+
+      if (shouldAutoPlay) {
+        // Yumuşak orman esintisi rotası (Lissajous eğrisi: top yosunlar üzerinde gezinir)
+        const t = elapsedSeconds * 1.5;
+        targetTouchX = 0.50 + Math.sin(t * 1.1) * 0.18;
+        targetTouchY = 0.50 + Math.cos(t * 1.7) * 0.16;
+
+        // Görünür, pofuduk kabarma dalgası (0.75 - 1.25 arası)
+        targetBulge = 0.95 + Math.sin(t * 2.8) * 0.35;
+
+        // Esintinin yönüne doğru doku yatması / yönelme
+        targetVelX = Math.cos(t * 1.1) * 0.18 * 0.85;
+        targetVelY = -Math.sin(t * 1.7) * 0.16 * 0.85;
+      }
 
       // 1. Dokunma Noktası Yumuşatma (Lerp)
       touchX += (targetTouchX - touchX) * 0.18;
