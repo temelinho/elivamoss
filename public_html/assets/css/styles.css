@@ -497,7 +497,7 @@ p {
 /* 6. HERO BÖLÜMÜ */
 .hero {
   position: relative;
-  min-height: 92vh;
+  min-height: 94vh;
   display: flex;
   align-items: center;
   background-color: var(--color-primary-darker);
@@ -513,44 +513,59 @@ p {
   z-index: 1;
 }
 
+.hero__bg picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 .hero__bg img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
-  filter: brightness(0.72) contrast(1.05);
+  filter: brightness(0.55) contrast(1.1);
 }
 
 .hero__overlay {
   position: absolute;
   inset: 0;
   z-index: 2;
-  background: linear-gradient(
-    to right,
-    rgba(20, 35, 27, 0.92) 0%,
-    rgba(20, 35, 27, 0.75) 50%,
-    rgba(20, 35, 27, 0.4) 100%
-  );
+  background: radial-gradient(circle at 75% 50%, rgba(20, 35, 27, 0.45) 0%, rgba(13, 23, 18, 0.90) 70%),
+              linear-gradient(to right, rgba(13, 23, 18, 0.96) 0%, rgba(13, 23, 18, 0.84) 50%, rgba(13, 23, 18, 0.52) 100%);
+}
+
+.hero__container {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+}
+
+.hero__grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 3.5rem;
 }
 
 .hero__content {
-  position: relative;
-  z-index: 3;
-  max-width: 680px;
+  max-width: 620px;
 }
 
 .hero__title {
   color: #FFFFFF;
   margin-bottom: 1.25rem;
   font-size: var(--text-3xl);
-  line-height: 1.12;
+  line-height: 1.14;
 }
 
 .hero__desc {
   font-size: var(--text-md);
   color: rgba(235, 229, 216, 0.92);
   line-height: 1.65;
-  margin-bottom: 2.25rem;
+  margin-bottom: 2rem;
 }
 
 .hero__buttons {
@@ -558,6 +573,167 @@ p {
   align-items: center;
   flex-wrap: wrap;
   gap: 1.25rem;
+  margin-bottom: 2.25rem;
+}
+
+.hero__trust-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--color-accent-champagne);
+  font-size: 0.825rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.trust-badge svg {
+  color: var(--color-accent-brass);
+  flex-shrink: 0;
+}
+
+/* İNTERAKTİF YOSUN TABLOSU (SAĞ SÜTUN & MOBİLDE ÖNCELİKLİ) */
+.hero__interactive {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.moss-frame-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  overflow: visible;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  background-color: #121c15;
+  box-shadow:
+    0 25px 60px -12px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(176, 141, 87, 0.4),
+    0 0 45px rgba(176, 141, 87, 0.12);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.moss-frame-wrapper:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 35px 75px -15px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(212, 175, 55, 0.6),
+    0 0 60px rgba(176, 141, 87, 0.25);
+}
+
+.moss-frame-wrapper:active {
+  cursor: grabbing;
+}
+
+.moss-interactive-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  z-index: 2;
+  display: block;
+}
+
+.moss-frame-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  z-index: 1;
+}
+
+/* İPUCU ROZETİ (FLOATING HINT BADGE) */
+.moss-hint-badge {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(14, 25, 19, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--color-accent-brass);
+  color: var(--color-accent-champagne);
+  padding: 0.5rem 1.15rem;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(176, 141, 87, 0.25);
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.moss-hint-badge svg {
+  color: var(--color-accent-brass);
+  animation: badgeSpin 4s linear infinite;
+}
+
+.moss-hint-badge__pulse {
+  width: 7px;
+  height: 7px;
+  background-color: #25D366;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px #25D366;
+  animation: badgePulse 2s infinite ease-in-out;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 1; }
+}
+
+@keyframes badgeSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.moss-hint-badge.badge--hidden {
+  opacity: 0;
+  transform: translate(-50%, 8px);
+}
+
+.moss-frame-caption {
+  margin-top: 1.75rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.moss-frame-caption__name {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  color: var(--color-accent-champagne);
+  letter-spacing: 0.03em;
+}
+
+.moss-frame-caption__hint {
+  font-size: 0.78rem;
+  color: rgba(235, 229, 216, 0.7);
 }
 
 /* 7. ÖZELLİKLER & MARKA VAADİ (3 SÜTUN) */
@@ -632,6 +808,12 @@ p {
   overflow: hidden;
   aspect-ratio: 1 / 1;
   background-color: #EEEAE2;
+}
+
+.product-card__thumb picture {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .product-card__thumb img {
@@ -734,6 +916,12 @@ p {
   border-radius: var(--radius-sm);
   overflow: hidden;
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.16);
+}
+
+.split-section__visual picture {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .split-section__visual img {
@@ -935,6 +1123,12 @@ p {
   border: 1px solid var(--color-border-subtle);
   background-color: #EEEAE2;
   margin-bottom: 1rem;
+}
+
+.product-gallery__main picture {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .product-gallery__main img {
@@ -1375,9 +1569,100 @@ p {
   .mobile-toggle {
     display: block;
   }
+
+  .hero {
+    min-height: auto;
+    padding-top: 6.5rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .hero__grid {
+    grid-template-columns: 1fr;
+    gap: 2.75rem;
+    text-align: center;
+  }
+
+  .hero__content {
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero__buttons {
+    justify-content: center;
+  }
+
+  .hero__trust-badges {
+    justify-content: center;
+  }
+
+  .moss-frame-wrapper {
+    max-width: min(340px, 86vw);
+  }
 }
 
 @media (max-width: 768px) {
+  .hero {
+    min-height: auto;
+    padding-top: 5.75rem;
+    padding-bottom: 3rem;
+  }
+
+  .hero__bg img {
+    object-position: 65% center;
+  }
+
+  .hero__title {
+    font-size: 2.15rem;
+  }
+
+  .hero__desc {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero__grid {
+    gap: 2.25rem;
+  }
+
+  .moss-frame-wrapper {
+    max-width: min(300px, 84vw);
+    box-shadow:
+      0 18px 45px -10px rgba(0, 0, 0, 0.75),
+      0 0 0 1px rgba(176, 141, 87, 0.45);
+  }
+
+  .moss-hint-badge {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.9rem;
+    bottom: -13px;
+  }
+
+  .moss-frame-caption__name {
+    font-size: 0.88rem;
+  }
+
+  .moss-frame-caption__hint {
+    font-size: 0.74rem;
+  }
+
+  .hero__trust-badges {
+    gap: 0.85rem;
+    flex-direction: column;
+    align-items: center;
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .hero__overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(20, 35, 27, 0.85) 0%,
+      rgba(20, 35, 27, 0.80) 50%,
+      rgba(20, 35, 27, 0.95) 100%
+    );
+  }
 
   .products-grid,
   .blog-grid,

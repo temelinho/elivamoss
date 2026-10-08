@@ -164,17 +164,59 @@
     </div>
     <div class="hero__overlay"></div>
 
-    <div class="container hero__content">
-      <span class="eyebrow">ZAMANSIZ BOTANİK SANAT</span>
-      <h1 class="hero__title">Doğanın Ebedi Dinginliği, Yaşam Alanlarınızda.</h1>
-      <p class="hero__desc">
-        Eliva Moss; el değmemiş dağlardan toplanan gerçek yosunları pirinç ve masif ahşabın zarafetiyle buluşturur. Sulama ve bakım gerektirmeyen, akustik konfor sunan mimari yosun duvarlar ve sanat panoları.
-      </p>
-      <div class="hero__buttons">
-        <a href="./urunler/index.html" class="btn btn-primary">Koleksiyonu Keşfet</a>
-        <a href="https://wa.me/905324866767?text=Merhaba,%20Eliva%20Moss%20ürünleri%20hakkında%20bilgi%20almak%20istiyorum." class="btn btn-secondary-light" target="_blank" rel="noopener noreferrer">
-          WhatsApp'tan Bilgi Al
-        </a>
+    <div class="container hero__container">
+      <div class="hero__grid">
+        <!-- Sol Kolon: Metinler & Aksiyonlar -->
+        <div class="hero__content">
+          <span class="eyebrow">ZAMANSIZ BOTANİK SANAT</span>
+          <h1 class="hero__title">Doğanın Ebedi Dinginliği, Yaşam Alanlarınızda.</h1>
+          <p class="hero__desc">
+            Eliva Moss; el değmemiş dağlardan toplanan gerçek yosunları pirinç ve masif ahşabın zarafetiyle buluşturur. Sulama ve bakım gerektirmeyen, akustik konfor sunan mimari yosun duvarlar ve sanat panoları.
+          </p>
+          <div class="hero__buttons">
+            <a href="./urunler/index.html" class="btn btn-primary">Koleksiyonu Keşfet</a>
+            <a href="https://wa.me/905324866767?text=Merhaba,%20Eliva%20Moss%20ürünleri%20hakkında%20bilgi%20almak%20istiyorum." class="btn btn-secondary-light" target="_blank" rel="noopener noreferrer">
+              WhatsApp'tan Bilgi Al
+            </a>
+          </div>
+
+          <!-- Güven Rozetleri -->
+          <div class="hero__trust-badges">
+            <div class="trust-badge">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+              <span>%100 Gerçek & Sıfır Bakım</span>
+            </div>
+            <div class="trust-badge">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+              <span>Özel Mimari Tasarım</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sağ Kolon (Mobilde Öncelikli & Dokunmatik): İnteraktif Yosun Tablosu -->
+        <div class="hero__interactive">
+          <div class="moss-frame-wrapper" id="moss-interactive-container" aria-label="İnteraktif dokunsal yosun panosu, dokunun ve sürükleyin">
+            <!-- WebGL 3D İnteraktif Canvas -->
+            <canvas id="moss-canvas" class="moss-interactive-canvas"></canvas>
+
+            <!-- Statik Görsel (WebGL Desteksiz / Yükleme Sırasında Görünür) -->
+            <img src="assets/img/hero-moss-interactive.webp" alt="Pirinç çerçeveli interaktif dokunsal yosun panosu" class="moss-frame-fallback" width="800" height="800" loading="eager" fetchpriority="high">
+
+            <!-- İnteraktif İpucu Rozeti (Floating Badge) -->
+            <div class="moss-hint-badge" id="moss-hint-badge" role="status" aria-live="polite">
+              <span class="moss-hint-badge__pulse"></span>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+              <span>Yosunlara dokunun & parmağınızı gezdirin</span>
+            </div>
+          </div>
+
+          <div class="moss-frame-caption">
+            <span class="moss-frame-caption__name">Eliva Aureum • Pirinç Çerçeveli Akustik Yosun Pano</span>
+            <span class="moss-frame-caption__hint">Dokunduğunuzda kabarır, elinizin yönüne yatar</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -618,5 +660,6 @@
 
   <!-- JavaScript -->
   <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/interactive-moss.js" defer></script>
 </body>
 </html>
