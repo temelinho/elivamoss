@@ -280,126 +280,17 @@
       }
     }
 
-    // --- LÜKS DOKUNMA GERİ BİLDİRİMİ (TACTILE UI TOUCH FEEDBACK AUDIO & HAPTICS) ---
-    let audioCtx = null;
-    let touchBuffer = null;
-    let isAudioMuted = false;
-    let lastFeedbackTime = 0;
-    let lastFeedbackX = 0;
-    let lastFeedbackY = 0;
-
-    const soundToggleBtn = document.getElementById('moss-sound-toggle');
-
-    function initAudioContext() {
-      if (!audioCtx) {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (AudioContextClass) {
-          audioCtx = new AudioContextClass();
-        }
-      }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-      if (!touchBuffer && audioCtx) {
-        fetch('assets/audio/touch-feedback.wav')
-          .then(res => res.arrayBuffer())
-          .then(buf => audioCtx.decodeAudioData(buf))
-          .then(decoded => { touchBuffer = decoded; })
-          .catch(() => {});
-      }
-    }
-
-    if (soundToggleBtn) {
-      soundToggleBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        isAudioMuted = !isAudioMuted;
-        const iconOn = soundToggleBtn.querySelector('.icon-sound-on');
-        const iconOff = soundToggleBtn.querySelector('.icon-sound-off');
-        if (iconOn && iconOff) {
-          iconOn.style.display = isAudioMuted ? 'none' : 'block';
-          iconOff.style.display = isAudioMuted ? 'block' : 'none';
-        }
-        soundToggleBtn.setAttribute('title', isAudioMuted ? 'Ses Kapalı' : 'Ses Açık');
-        if (!isAudioMuted) {
-          playTouchFeedback(1.0, 0.7);
-        }
-      });
-    }
-
-    // Telefon titreşim desteği (Haptic Feedback)
-    function triggerHaptic(duration = 18) {
-      if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        try {
-          navigator.vibrate(duration);
-        } catch (e) {}
-      }
-    }
-
-    // Net, tatmin edici ve lüks dokunma geri bildirimi sesi (UI Touch Tap Feedback)
-    function playTouchFeedback(pitch = 1.0, volume = 0.65) {
-      if (isAudioMuted) return;
-
-      const nowTime = performance.now();
-      if (nowTime - lastFeedbackTime < 65) return;
-      lastFeedbackTime = nowTime;
-
-      initAudioContext();
-      triggerHaptic(pitch < 1.05 ? 18 : 12);
-
-      if (!audioCtx) return;
-
-      if (touchBuffer) {
-        const source = audioCtx.createBufferSource();
-        source.buffer = touchBuffer;
-        source.playbackRate.value = pitch;
-
-        const gainNode = audioCtx.createGain();
-        gainNode.gain.value = volume;
-
-        source.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        source.start(0);
-      } else {
-        // Canlı Dokunma Tıkı Sentezleyici
-        const ctxNow = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        const filter = audioCtx.createBiquadFilter();
-
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(1150 * pitch, ctxNow);
-        filter.Q.setValueAtTime(3.2, ctxNow);
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(1300 * pitch, ctxNow);
-        osc.frequency.exponentialRampToValueAtTime(360, ctxNow + 0.038);
-
-        gain.gain.setValueAtTime(volume * 0.9, ctxNow);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctxNow + 0.042);
-
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.start(ctxNow);
-        osc.stop(ctxNow + 0.045);
-      }
-    }
-
     // --- FARE / DESKTOP ETKİLEŞİMLERİ ---
     container.addEventListener('mouseenter', function (e) {
       isInteracting = true;
       userHasInteracted = true;
       lastUserInteractionTime = performance.now();
-      initAudioContext();
       targetBulge = 0.85;
       const uv = getUV(e.clientX, e.clientY);
       targetTouchX = uv.x;
       targetTouchY = uv.y;
       lastEventX = e.clientX;
       lastEventY = e.clientY;
-      lastFeedbackX = e.clientX;
-      lastFeedbackY = e.clientY;
     });
 
     container.addEventListener('mousemove', function (e) {
@@ -413,14 +304,6 @@
       targetVelX = Math.max(-0.35, Math.min(0.35, dx * 1.2));
       targetVelY = Math.max(-0.35, Math.min(0.35, dy * 1.2));
 
-      // Sürüklerken yosun dokusunda hafif haptik tıkırtı
-      const moveDist = Math.hypot(e.clientX - lastFeedbackX, e.clientY - lastFeedbackY);
-      if (moveDist > 48) {
-        playTouchFeedback(0.94 + Math.random() * 0.12, 0.42);
-        lastFeedbackX = e.clientX;
-        lastFeedbackY = e.clientY;
-      }
-
       lastEventX = e.clientX;
       lastEventY = e.clientY;
 
@@ -431,20 +314,16 @@
       hideBadge();
     });
 
-    container.addEventListener('mousedown', function (e) {
+    container.addEventListener('mousedown', function () {
       targetBulge = 1.75;
       userHasInteracted = true;
       lastUserInteractionTime = performance.now();
-      lastFeedbackX = e.clientX;
-      lastFeedbackY = e.clientY;
-      playTouchFeedback(1.0, 0.72);
       hideBadge();
     });
 
     window.addEventListener('mouseup', function () {
       if (isInteracting) {
         targetBulge = 1.20;
-        playTouchFeedback(1.18, 0.38); // Hafif bırakma tıkı
       }
     });
 
@@ -468,15 +347,12 @@
 
         lastEventX = touch.clientX;
         lastEventY = touch.clientY;
-        lastFeedbackX = touch.clientX;
-        lastFeedbackY = touch.clientY;
 
         isInteracting = true;
         userHasInteracted = true;
         lastUserInteractionTime = performance.now();
         targetBulge = 1.65;
 
-        playTouchFeedback(1.0, 0.75); // Dokunma anında net geri bildirim sesi
         hideBadge();
       }
     }, { passive: true });
@@ -493,14 +369,6 @@
 
         targetVelX = Math.max(-0.4, Math.min(0.4, dx * 1.5));
         targetVelY = Math.max(-0.4, Math.min(0.4, dy * 1.5));
-
-        // Parmağı gezdirirken mikro haptik geri bildirim
-        const moveDist = Math.hypot(touch.clientX - lastFeedbackX, touch.clientY - lastFeedbackY);
-        if (moveDist > 42) {
-          playTouchFeedback(0.95 + Math.random() * 0.12, 0.45);
-          lastFeedbackX = touch.clientX;
-          lastFeedbackY = touch.clientY;
-        }
 
         lastEventX = touch.clientX;
         lastEventY = touch.clientY;
@@ -519,7 +387,6 @@
       targetBulge = 0.0;
       targetVelX = 0.0;
       targetVelY = 0.0;
-      playTouchFeedback(1.2, 0.35); // Bırakma mikro tıkı
     }, { passive: true });
 
     container.addEventListener('touchcancel', function () {
