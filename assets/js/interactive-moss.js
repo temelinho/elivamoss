@@ -67,46 +67,43 @@
         // Maske: Çerçeve alanı 0.0, yosun alanları 0.3 - 1.0
         float mask = texture2D(uMask, uv).r;
 
-        // 1. Organik Nefes Alma (Idle Yaşam Dalgası - Sadece yosunlarda)
-        float idleWave = sin(uv.y * 14.0 + uTime * 1.8) * cos(uv.x * 12.0 + uTime * 1.4) * 0.0022 * mask;
-
-        // 2. Dokunulan Noktaya Uzaklık
+        // 1. Dokunulan Noktaya Uzaklık
         vec2 delta = uv - uTouch;
         float dist = length(delta);
 
-        // 3. Kabarma Etkisi (Gaussian Falloff Kubbesi)
+        // 2. Doğal Kubbe Eğrisi (Pofuduk tepe/kabarma, sıfır sarmal)
         float influence = 0.0;
         if (dist < uRadius) {
           float normD = dist / uRadius;
-          influence = (1.0 - normD) * (1.0 - normD); // Yumuşak eğri
+          // Pürüzsüz kosinüs kubbesi: merkezde yumuşak tepe, kenarda tatlı sönüm
+          float dome = cos(normD * 1.5707963);
+          influence = dome * dome;
         }
 
         // SADECE yosunlar kabarır, çerçeve kesinlikle kabarmasın!
         float bulgeFactor = influence * uBulge * mask;
 
-        // 4. Z-Ekseninde 3D Dışa Doğru Kabarma (Lens / Rölyef Şişmesi)
-        vec2 radialDir = dist > 0.0001 ? normalize(delta) : vec2(0.0);
-        vec2 bulgeOffset = -radialDir * bulgeFactor * 0.058;
+        // 3. İmlecin ucunda doğal dışa doğru 3D kabarma (Merkezde tekillik/kırılma/sarmal yapmaz)
+        vec2 bulgeOffset = -delta * (bulgeFactor * 0.28);
 
-        // 5. Parmağın Sağa/Sola Hareketine Doğru Yönelme (Tüylerin / Liflerin Yatması)
-        // uVelocity: parmağın anlık hareket vektörü
-        vec2 swayOffset = -uVelocity * influence * mask * 0.42;
+        // 4. Doğal hafif yatma (Sarmal/dönme yok, sadece anlık meyil)
+        vec2 dragOffset = -uVelocity * (bulgeFactor * 0.12);
 
         // Toplam Deformasyon
-        vec2 displacedUv = uv + bulgeOffset + swayOffset + vec2(idleWave);
+        vec2 displacedUv = uv + bulgeOffset + dragOffset;
         displacedUv = clamp(displacedUv, 0.001, 0.999);
 
         // Ana Doku Örnekleme
         vec4 color = texture2D(uTexture, displacedUv);
 
-        // 6. Dinamik 3D Işık ve Gölge
+        // 5. Dinamik 3D Işık ve Gölge (Kabaran kubbenin tepe ışığı)
         vec3 normal = texture2D(uNormal, displacedUv).rgb * 2.0 - 1.0;
-        vec3 lightDir = normalize(vec3(uTouch.x - uv.x, (1.0 - uTouch.y) - (1.0 - uv.y), 0.5));
+        vec3 lightDir = normalize(vec3(uTouch.x - uv.x, (1.0 - uTouch.y) - (1.0 - uv.y), 0.55));
         float diffLight = max(dot(normal, lightDir), 0.0);
 
         // Kabardıkça ışık vurgusunu ve derinlik gölgesini güçlendir
-        float lightEffect = bulgeFactor * 1.8;
-        color.rgb += vec3(diffLight * 0.14 * lightEffect);
+        float lightEffect = bulgeFactor * 1.6;
+        color.rgb += vec3(diffLight * 0.15 * lightEffect);
 
         gl_FragColor = color;
       }
@@ -304,8 +301,9 @@
       const dx = (e.clientX - lastEventX) / (canvas.clientWidth || 400);
       const dy = (e.clientY - lastEventY) / (canvas.clientHeight || 400);
 
-      targetVelX = Math.max(-0.6, Math.min(0.6, targetVelX + dx * 1.6));
-      targetVelY = Math.max(-0.6, Math.min(0.6, targetVelY + dy * 1.6));
+      // Anlık parmak/fare hızı (Sarmal birikim yapmaz, doğrudan yönü yansıtır)
+      targetVelX = Math.max(-0.35, Math.min(0.35, dx * 1.2));
+      targetVelY = Math.max(-0.35, Math.min(0.35, dy * 1.2));
 
       lastEventX = e.clientX;
       lastEventY = e.clientY;
@@ -313,12 +311,12 @@
       isInteracting = true;
       userHasInteracted = true;
       lastUserInteractionTime = performance.now();
-      targetBulge = 0.95;
+      targetBulge = 1.35; // İmlecin ucu doğal şekilde kabarır
       hideBadge();
     });
 
     container.addEventListener('mousedown', function (e) {
-      targetBulge = 1.45; // Tıklayınca ekstra yüksek kabarma!
+      targetBulge = 1.75; // Tıklayınca ekstra dolgun doğal kabarma!
       userHasInteracted = true;
       lastUserInteractionTime = performance.now();
       hideBadge();
@@ -326,7 +324,7 @@
 
     window.addEventListener('mouseup', function () {
       if (isInteracting) {
-        targetBulge = 0.85;
+        targetBulge = 1.20;
       }
     });
 
@@ -354,7 +352,7 @@
         isInteracting = true;
         userHasInteracted = true;
         lastUserInteractionTime = performance.now();
-        targetBulge = 1.35; // Dokununca hemen pofudukça kabarsın!
+        targetBulge = 1.65; // Dokununca imlecin ucu hemen pofudukça kabarsın!
         hideBadge();
       }
     }, { passive: true });
@@ -369,9 +367,9 @@
         const dx = (touch.clientX - lastEventX) / (canvas.clientWidth || 300);
         const dy = (touch.clientY - lastEventY) / (canvas.clientHeight || 300);
 
-        // Parmağın yönüne doğru yosunların yatması / akışı
-        targetVelX = Math.max(-0.8, Math.min(0.8, targetVelX + dx * 2.2));
-        targetVelY = Math.max(-0.8, Math.min(0.8, targetVelY + dy * 2.2));
+        // Anlık sürükleme yönü (Sarmal dönme yapmaz, temiz doğrusal meyil)
+        targetVelX = Math.max(-0.4, Math.min(0.4, dx * 1.5));
+        targetVelY = Math.max(-0.4, Math.min(0.4, dy * 1.5));
 
         lastEventX = touch.clientX;
         lastEventY = touch.clientY;
@@ -379,7 +377,7 @@
         isInteracting = true;
         userHasInteracted = true;
         lastUserInteractionTime = performance.now();
-        targetBulge = 1.25;
+        targetBulge = 1.45; // Sürüklerken parmağın altında pofuduk kabarma
         hideBadge();
       }
     }, { passive: true });
@@ -406,24 +404,22 @@
     function render(currentTime) {
       const elapsedSeconds = (currentTime - startTime) * 0.001;
 
-      // 0. KULLANICI DOKUNMADIĞINDA OTOMATİK CANLI GÖSTERİM (AUTO-DEMO)
-      // Sayfa açıldığında yosunlar kendi kendine kabararak ve sağa sola yatarak
-      // kullanıcının dikkatini çeker ("Bu canlı/dokunsal bir şey!" mesajı verir)
+      // 0. KULLANICI DOKUNMADIĞINDA OTOMATİK CANLI GÖSTERİM (%50 DAHA GENİŞ VE CANLI)
       const timeSinceUser = currentTime - lastUserInteractionTime;
-      const shouldAutoPlay = !isInteracting && (!userHasInteracted || timeSinceUser > 2600);
+      const shouldAutoPlay = !isInteracting && (!userHasInteracted || timeSinceUser > 2400);
 
       if (shouldAutoPlay) {
-        // Yumuşak orman esintisi rotası (Lissajous eğrisi: top yosunlar üzerinde gezinir)
-        const t = elapsedSeconds * 1.5;
-        targetTouchX = 0.50 + Math.sin(t * 1.1) * 0.18;
-        targetTouchY = 0.50 + Math.cos(t * 1.7) * 0.16;
+        // %50 daha geniş rota: Tüm panonun top yosunları üzerinde belirgin gezinir
+        const t = elapsedSeconds * 1.6;
+        targetTouchX = 0.50 + Math.sin(t * 1.2) * 0.28;
+        targetTouchY = 0.50 + Math.cos(t * 1.8) * 0.24;
 
-        // Görünür, pofuduk kabarma dalgası (0.75 - 1.25 arası)
-        targetBulge = 0.95 + Math.sin(t * 2.8) * 0.35;
+        // %50 daha güçlü kabarma dalgası (1.1 - 1.8 arası belirgin kabarma)
+        targetBulge = 1.45 + Math.sin(t * 3.0) * 0.50;
 
-        // Esintinin yönüne doğru doku yatması / yönelme
-        targetVelX = Math.cos(t * 1.1) * 0.18 * 0.85;
-        targetVelY = -Math.sin(t * 1.7) * 0.16 * 0.85;
+        // Yumuşak doğal meyil
+        targetVelX = Math.cos(t * 1.2) * 0.28 * 0.35;
+        targetVelY = -Math.sin(t * 1.8) * 0.24 * 0.35;
       }
 
       // 1. Dokunma Noktası Yumuşatma (Lerp)
