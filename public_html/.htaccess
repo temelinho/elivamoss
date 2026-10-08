@@ -1,0 +1,73 @@
+# ==============================================================================
+# ELIVA MOSS — Apache / Metunic .htaccess Konfigürasyonu
+# ==============================================================================
+
+# 1. Varsayılan Karakter Seti
+AddDefaultCharset UTF-8
+
+# 2. Yeniden Yazım Motoru (mod_rewrite)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # HTTPS Zorunluluğu
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # www'den non-www'ye Kanonik Yönlendirme
+  RewriteCond %{HTTP_HOST} ^www\.elivamoss\.com\.tr$ [NC]
+  RewriteRule ^(.*)$ https://elivamoss.com.tr/$1 [L,R=301]
+
+  # Dizinler için Otomatik Eğik Çizgi (Trailing Slash) Ekleme
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteCond %{REQUEST_URI} !(.*)/$
+  RewriteRule ^(.*)$ https://elivamoss.com.tr/$1/ [L,R=301]
+</IfModule>
+
+# 3. Gzip / Deflate Sıkıştırma (Hız ve Core Web Vitals)
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE text/xml
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/x-javascript
+  AddOutputFilterByType DEFLATE application/json
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE application/xhtml+xml
+  AddOutputFilterByType DEFLATE application/rss+xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# 4. Tarayıcı Önbellekleme (Browser Caching)
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Fontlar (1 Yıl)
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType application/font-woff2 "access plus 1 year"
+
+  # Görseller (1 Yıl)
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+
+  # CSS ve JavaScript (1 Ay)
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType text/javascript "access plus 1 month"
+
+  # HTML Sayfalar (1 Gün)
+  ExpiresByType text/html "access plus 1 day"
+</IfModule>
+
+# 5. Güvenlik Başlıkları (Security Headers)
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
