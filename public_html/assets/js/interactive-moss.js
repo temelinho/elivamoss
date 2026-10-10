@@ -57,7 +57,8 @@
       uniform sampler2D uDepth;       // Yükseklik Haritası: Çerçeve=1 (önde), yosun 0.04-0.70 (gömülü)
       uniform vec2 uTilt;            // Bakış açısı eğimi (-1..1): fare / telefon eğimi
       uniform float uDepthScale;     // Derinlik (parallax) şiddeti
-      uniform vec4 uInner;           // Çerçeve iç alanı (minX, minY, maxX, maxY) UV
+      uniform vec4 uInner;           // Işının kalacağı güvenli iç alan (minX, minY, maxX, maxY) UV
+      uniform vec4 uFrame;           // Pirinç çerçevenin tam iç kenarı (minX, minY, maxX, maxY) UV
 
       float gEdge = 0.0;             // Işın çerçeve duvarına ne kadar dayandı (iç duvar gölgesi)
 
@@ -135,7 +136,7 @@
 
         // 4b. Gerçek derinlik: bakış açısına göre katmanlar farklı hızda kayar.
         // Yosun fotoğrafı çerçevenin altına taşacak kadar hafif büyütülür: en uç açıda bile kenarda boşluk kalmaz.
-        bool insideFrame = all(greaterThan(uv, uInner.xy)) && all(lessThan(uv, uInner.zw));
+        bool insideFrame = all(greaterThan(uv, uFrame.xy)) && all(lessThan(uv, uFrame.zw));
         if (insideFrame) {
           displacedUv = vec2(0.5) + (displacedUv - vec2(0.5)) * 0.885;
         }
@@ -164,10 +165,10 @@
         // 7. Çerçevenin iç duvarı: bakış açısı yana kaydıkça kenarda yumuşak gölge
         if (insideFrame) {
           // Çerçevenin yosun üzerine düşen yumuşak iç gölgesi; bakış yönüne göre bir kenarda genişler
-          float dL = uv.x - uInner.x;
-          float dR = uInner.z - uv.x;
-          float dT = (uv.y - uInner.y) * uAspect;
-          float dB = (uInner.w - uv.y) * uAspect;
+          float dL = uv.x - uFrame.x;
+          float dR = uFrame.z - uv.x;
+          float dT = (uv.y - uFrame.y) * uAspect;
+          float dB = (uFrame.w - uv.y) * uAspect;
           float sh = 1.0;
           sh *= mix(0.55, 1.0, smoothstep(0.0, 0.022 + max(0.0, -uTilt.x) * 0.03, dL));
           sh *= mix(0.55, 1.0, smoothstep(0.0, 0.022 + max(0.0,  uTilt.x) * 0.03, dR));
@@ -255,7 +256,9 @@
     gl.uniform1i(uDepthLoc, 3);
     gl.uniform1f(uDepthScaleLoc, 0.05);
     // Pirinç çerçeve kalınlığı: 800x1200 dokuda 40px (+3px pay: doku filtrelemesi pirinci karıştırmasın)
-    gl.uniform4f(gl.getUniformLocation(program, 'uInner'), 43 / 800, 43 / 1200, 1 - 43 / 800, 1 - 43 / 1200);
+    // Fotoğraftaki gerçek ölçü: üst/sol çıta 38px'te, alt/sağ çıta 40px'te bitiyor
+    gl.uniform4f(gl.getUniformLocation(program, 'uInner'), 41 / 800, 41 / 1200, 1 - 43 / 800, 1 - 43 / 1200);
+    gl.uniform4f(gl.getUniformLocation(program, 'uFrame'), 38 / 800, 38 / 1200, 1 - 40 / 800, 1 - 40 / 1200);
 
     // Dokular yüklenene kadar canvas gizli: statik görsel görünür, düz yeşil kare görünmez
     canvas.style.opacity = '0';
@@ -356,8 +359,8 @@
     let tiltX = 0.0, tiltY = 0.0;
     let targetTiltX = 0.0, targetTiltY = 0.0;
     let lastTiltInputTime = -99999;
-    let gyroActive = false;
-    let gyroBaseBeta = null, gyroBaseGamma = null;
+    // Dokunmatik cihazlarda (telefon/tablet) derinlik kapalı: sadece dokunma kabarması
+    const isTouchDevice = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
     // Yay Sabitleri (Doğal, süngerimsi organik hissiyat)
     const STIFFNESS = 0.22;
@@ -404,6 +407,7 @@
 
     // --- DERİNLİK: FARE KONUMU (Masaüstü — sayfanın her yerinden) ---
     window.addEventListener('mousemove', function (e) {
+      if (isTouchDevice) return;
       const rect = container.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
@@ -413,41 +417,6 @@
       targetTiltY = Math.max(-1, Math.min(1, (e.clientY - cy) / ry));
       lastTiltInputTime = performance.now();
     }, { passive: true });
-
-    // --- DERİNLİK: TELEFON EĞİMİ (Jiroskop) ---
-    function onOrientation(e) {
-      if (e.beta === null || e.gamma === null) return;
-      if (gyroBaseBeta === null) { gyroBaseBeta = e.beta; gyroBaseGamma = e.gamma; }
-      // Başlangıç tutuşuna göre fark: ±25 derece tam etki
-      targetTiltX = Math.max(-1, Math.min(1, (e.gamma - gyroBaseGamma) / 25));
-      targetTiltY = Math.max(-1, Math.min(1, (e.beta - gyroBaseBeta) / 25));
-      // Taban açısı yavaşça yeni tutuşa uyum sağlasın
-      gyroBaseBeta += (e.beta - gyroBaseBeta) * 0.01;
-      gyroBaseGamma += (e.gamma - gyroBaseGamma) * 0.01;
-      gyroActive = true;
-      lastTiltInputTime = performance.now();
-    }
-
-    function enableGyro() {
-      if (typeof DeviceOrientationEvent === 'undefined') return;
-      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        // iOS: izin sadece kullanıcı dokunuşuyla istenebilir
-        DeviceOrientationEvent.requestPermission().then(function (state) {
-          if (state === 'granted') window.addEventListener('deviceorientation', onOrientation, { passive: true });
-        }).catch(function () {});
-      } else {
-        window.addEventListener('deviceorientation', onOrientation, { passive: true });
-      }
-    }
-
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission !== 'function') {
-      enableGyro();
-    } else {
-      container.addEventListener('touchend', function askOnce() {
-        container.removeEventListener('touchend', askOnce);
-        enableGyro();
-      });
-    }
 
     // --- FARE / DESKTOP ETKİLEŞİMLERİ ---
     container.addEventListener('mouseenter', function (e) {
@@ -546,11 +515,6 @@
         userHasInteracted = true;
         lastUserInteractionTime = performance.now();
         targetBulge = 1.45;
-        if (!gyroActive) {
-          targetTiltX = (uv.x - 0.5) * 1.6;
-          targetTiltY = (uv.y - 0.5) * 1.6;
-          lastTiltInputTime = performance.now();
-        }
         hideBadge();
       }
     }, { passive: true });
@@ -593,7 +557,10 @@
       }
 
       // 0b. Bakış açısı: girdi yoksa yavaş, sakin bir salınım (derinlik kendiliğinden görünsün)
-      if (currentTime - lastTiltInputTime > 3000) {
+      if (isTouchDevice) {
+        targetTiltX = 0.0;
+        targetTiltY = 0.0;
+      } else if (currentTime - lastTiltInputTime > 3000) {
         const tt = elapsedSeconds * 0.55;
         targetTiltX = Math.sin(tt) * 0.75;
         targetTiltY = Math.sin(tt * 0.7 + 1.3) * 0.5;
