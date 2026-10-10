@@ -18,6 +18,10 @@ AddDefaultCharset UTF-8
   RewriteCond %{HTTP_HOST} ^www\.elivamoss\.com\.tr$ [NC]
   RewriteRule ^(.*)$ https://elivamoss.com.tr/$1 [L,R=301]
 
+  # Eski adresler -> yeni site yapısı (kalıcı yönlendirme)
+  RewriteRule ^urunler/?(index\.html)?$ https://elivamoss.com.tr/magaza/ [L,R=301]
+  RewriteRule ^kurumsal-yosun-duvar/?(index\.html)?$ https://elivamoss.com.tr/hizmetlerimiz/yosun-duvar/ [L,R=301]
+
   # Dizinler için Otomatik Eğik Çizgi (Trailing Slash) Ekleme
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteCond %{REQUEST_URI} !(.*)/$

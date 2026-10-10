@@ -1,92 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Ana Sayfa -->
   <url>
     <loc>https://elivamoss.com.tr/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-10-11</lastmod>
     <priority>1.0</priority>
   </url>
-
-  <!-- Ürünler Vitrini -->
   <url>
-    <loc>https://elivamoss.com.tr/urunler/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://elivamoss.com.tr/hakkimizda/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://elivamoss.com.tr/hizmetlerimiz/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://elivamoss.com.tr/hizmetlerimiz/dikey-bahce-tasarimi/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://elivamoss.com.tr/hizmetlerimiz/yosun-duvar/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://elivamoss.com.tr/hizmetlerimiz/ic-mekan-peyzaj-tasarimi/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://elivamoss.com.tr/hizmetlerimiz/bonsai-agac/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://elivamoss.com.tr/hizmetlerimiz/el-yapimi-dekoratif-agaclar/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://elivamoss.com.tr/hizmetlerimiz/toptan-satis/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://elivamoss.com.tr/projelerimiz/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://elivamoss.com.tr/referanslarimiz/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://elivamoss.com.tr/magaza/</loc>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://elivamoss.com.tr/urunler/stabilize-yosun-pano/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://elivamoss.com.tr/urunler/yastik-yosunu-tablo/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://elivamoss.com.tr/urunler/terraryum-yosunu-seti/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.8</priority>
   </url>
-
-  <!-- Kurumsal Projeler -->
-  <url>
-    <loc>https://elivamoss.com.tr/kurumsal-yosun-duvar/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- Hakkımızda -->
-  <url>
-    <loc>https://elivamoss.com.tr/hakkimizda/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- İletişim -->
-  <url>
-    <loc>https://elivamoss.com.tr/iletisim/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Blog / Bilgi Merkezi -->
   <url>
     <loc>https://elivamoss.com.tr/blog/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://elivamoss.com.tr/blog/stabilize-yosun-nedir/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://elivamoss.com.tr/blog/yosun-duvar-bakimi/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://elivamoss.com.tr/blog/ofis-icin-yosun-duvar/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://elivamoss.com.tr/blog/yosun-duvar-fiyatlari/</loc>
-    <lastmod>2026-03-25</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://elivamoss.com.tr/iletisim/</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.9</priority>
   </url>
 </urlset>

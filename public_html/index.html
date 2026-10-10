@@ -22,7 +22,7 @@
   <meta name="twitter:image" content="https://elivamoss.com.tr/og-image.jpg">
 
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261011">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261011f">
 
   <!-- Yapılandırılmış Veri: Organization Schema -->
   <script type="application/ld+json">
@@ -97,11 +97,22 @@
       </a>
 
       <nav class="nav-menu" aria-label="Ana Menü">
-        <a href="./index.html" class="nav-link active">Ana Sayfa</a>
-        <a href="./urunler/index.html" class="nav-link">Ürünler</a>
-        <a href="./kurumsal-yosun-duvar/index.html" class="nav-link">Kurumsal Projeler</a>
         <a href="./hakkimizda/index.html" class="nav-link">Hakkımızda</a>
-        <a href="./blog/index.html" class="nav-link">Rehber</a>
+        <div class="nav-dropdown">
+          <a href="./hizmetlerimiz/index.html" class="nav-link nav-link--parent" aria-haspopup="true">Hizmetlerimiz <svg class="nav-caret" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></a>
+          <div class="nav-dropdown__menu">
+            <a href="./hizmetlerimiz/dikey-bahce-tasarimi/index.html" class="nav-dropdown__link">Dikey Bahçe Tasarımı</a>
+            <a href="./hizmetlerimiz/yosun-duvar/index.html" class="nav-dropdown__link">Yosun Duvar</a>
+            <a href="./hizmetlerimiz/ic-mekan-peyzaj-tasarimi/index.html" class="nav-dropdown__link">İç Mekan Peyzaj Tasarımı</a>
+            <a href="./hizmetlerimiz/bonsai-agac/index.html" class="nav-dropdown__link">Bonsai Ağaç</a>
+            <a href="./hizmetlerimiz/el-yapimi-dekoratif-agaclar/index.html" class="nav-dropdown__link">El Yapımı Dekoratif Ağaçlar</a>
+            <a href="./hizmetlerimiz/toptan-satis/index.html" class="nav-dropdown__link">Toptan Satış</a>
+          </div>
+        </div>
+        <a href="./projelerimiz/index.html" class="nav-link">Projelerimiz</a>
+        <a href="./referanslarimiz/index.html" class="nav-link">Referanslarımız</a>
+        <a href="./magaza/index.html" class="nav-link">Mağaza</a>
+        <a href="./blog/index.html" class="nav-link">Blog</a>
         <a href="./iletisim/index.html" class="nav-link">İletişim</a>
       </nav>
 
@@ -133,21 +144,28 @@
     <div>
       <button class="mobile-drawer__close" aria-label="Menüyü Kapat">&times;</button>
       <nav class="mobile-drawer__nav">
-        <a href="./index.html" class="mobile-drawer__link active">Ana Sayfa</a>
-        <a href="./urunler/index.html" class="mobile-drawer__link">Ürünler</a>
-        <a href="./kurumsal-yosun-duvar/index.html" class="mobile-drawer__link">Kurumsal Projeler</a>
         <a href="./hakkimizda/index.html" class="mobile-drawer__link">Hakkımızda</a>
-        <a href="./blog/index.html" class="mobile-drawer__link">Rehber</a>
+        <details class="mobile-drawer__group">
+          <summary class="mobile-drawer__summary">Hizmetlerimiz <svg class="nav-caret" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="mobile-drawer__sub">
+            <a href="./hizmetlerimiz/index.html" class="mobile-drawer__link mobile-drawer__sublink">Tüm Hizmetler</a>
+            <a href="./hizmetlerimiz/dikey-bahce-tasarimi/index.html" class="mobile-drawer__link mobile-drawer__sublink">Dikey Bahçe Tasarımı</a>
+            <a href="./hizmetlerimiz/yosun-duvar/index.html" class="mobile-drawer__link mobile-drawer__sublink">Yosun Duvar</a>
+            <a href="./hizmetlerimiz/ic-mekan-peyzaj-tasarimi/index.html" class="mobile-drawer__link mobile-drawer__sublink">İç Mekan Peyzaj Tasarımı</a>
+            <a href="./hizmetlerimiz/bonsai-agac/index.html" class="mobile-drawer__link mobile-drawer__sublink">Bonsai Ağaç</a>
+            <a href="./hizmetlerimiz/el-yapimi-dekoratif-agaclar/index.html" class="mobile-drawer__link mobile-drawer__sublink">El Yapımı Dekoratif Ağaçlar</a>
+            <a href="./hizmetlerimiz/toptan-satis/index.html" class="mobile-drawer__link mobile-drawer__sublink">Toptan Satış</a>
+          </div>
+        </details>
+        <a href="./projelerimiz/index.html" class="mobile-drawer__link">Projelerimiz</a>
+        <a href="./referanslarimiz/index.html" class="mobile-drawer__link">Referanslarımız</a>
+        <a href="./magaza/index.html" class="mobile-drawer__link">Mağaza</a>
+        <a href="./blog/index.html" class="mobile-drawer__link">Blog</a>
         <a href="./iletisim/index.html" class="mobile-drawer__link">İletişim</a>
       </nav>
     </div>
     <div class="mobile-drawer__actions">
-      <a href="tel:+905324866767" class="btn btn-secondary-light">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-          <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-        </svg>
-        0532 486 67 67
-      </a>
+      <a href="tel:+905324866767" class="btn btn-secondary-light">0532 486 67 67</a>
       <a href="https://wa.me/905324866767?text=Merhaba,%20Eliva%20Moss%20ürünleri%20hakkında%20bilgi%20almak%20istiyorum." class="btn btn-whatsapp" target="_blank" rel="noopener noreferrer">
         WhatsApp ile Ulaşın
       </a>
@@ -174,7 +192,7 @@
             El değmemiş dağlardan toplanan birinci sınıf canlı dokulu dağ yosunları, mimari yosun duvar panoları ve akustik botanik sanat eserleri. Sulama ve bakım gerektirmez, doğrudan üreticiden orijinal garantili.
           </p>
           <div class="hero__buttons">
-            <a href="./urunler/index.html" class="btn btn-primary">Koleksiyonu Keşfet</a>
+            <a href="./magaza/index.html" class="btn btn-primary">Koleksiyonu Keşfet</a>
             <a href="https://wa.me/905324866767?text=Merhaba,%20Eliva%20Moss%20ürünleri%20hakkında%20bilgi%20almak%20istiyorum." class="btn btn-secondary-light" target="_blank" rel="noopener noreferrer">
               WhatsApp'tan Bilgi Al
             </a>
@@ -224,101 +242,166 @@
     </div>
   </section>
 
-  <!-- 2. Öne Çıkan Ürünler Vitrini -->
+  <!-- 2. Hizmetlerimiz -->
   <section class="section section--surface">
     <div class="container">
       <div class="section-header text-center">
-        <span class="eyebrow">ÖZEL KOLEKSİYON</span>
-        <h2>Mekanınıza Zarafet Katan Tasarımlar</h2>
+        <span class="eyebrow">HİZMETLERİMİZ</span>
+        <h2>Mekanlara Doğa Katan Çözümler</h2>
         <div class="brass-line"></div>
-        <p>Her biri doğanın eşsiz dokularını yansıtan el yapımı stabilize yosun panolarımızı ve koleksiyon setlerimizi keşfedin.</p>
+        <p>Yosun duvardan dikey bahçeye, iç mekan peyzajından bonsai ve dekoratif ağaçlara kadar projelerinizi keşiften montaja tek ekiple yönetiyoruz.</p>
       </div>
 
-      <div class="products-grid">
-        <!-- Ürün 1 -->
-        <article class="product-card">
-          <div class="product-card__thumb">
-            <span class="product-card__badge">Çok Satan</span>
-            <picture>
-              <source srcset="assets/img/stabilize-yosun-pano.webp" type="image/webp">
-              <img src="assets/img/stabilize-yosun-pano.jpg" alt="Pirinç çerçeveli stabilize yosun pano" width="600" height="600" loading="lazy">
-            </picture>
-          </div>
-          <div class="product-card__body">
-            <span class="product-card__cat">Panolar</span>
-            <h3 class="product-card__title">
-              <a href="./urunler/stabilize-yosun-pano/index.html">Stabilize Yosun Pano</a>
-            </h3>
-            <p class="product-card__desc">Doğal dağ ve adaçayı yosunlarının özel stabilize tekniğiyle pirinç çerçevede buluştuğu zamansız duvar panosu.</p>
-            <div class="product-card__footer">
-              <span class="product-info__badge" style="font-size:0.8rem; color:var(--color-accent-brass); font-weight:600;">Özel Ölçü İmkanı</span>
-              <a href="./urunler/stabilize-yosun-pano/index.html" class="product-card__cta">
-                İncele
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </a>
-            </div>
+      <div class="services-grid">
+        <article class="service-card">
+          <a href="./hizmetlerimiz/dikey-bahce-tasarimi/index.html" class="service-card__thumb" tabindex="-1" aria-hidden="true">
+            <div class="img-slot"><img src="./assets/img/hizmetler/dikey-bahce-tasarimi-kapak.jpg" alt="Dikey Bahçe Tasarımı" loading="lazy" onerror="this.remove()"><span class="img-slot__label">Görsel alanı<small>hizmetler/dikey-bahce-tasarimi-kapak.jpg</small></span></div>
+          </a>
+          <div class="service-card__body">
+            <h3 class="service-card__title"><a href="./hizmetlerimiz/dikey-bahce-tasarimi/index.html">Dikey Bahçe Tasarımı</a></h3>
+            <p>Duvarları yaşayan bir yeşil yüzeye dönüştüren, iç ve dış mekana uygun dikey bahçe sistemleri tasarlıyor ve uyguluyoruz.</p>
+            <a href="./hizmetlerimiz/dikey-bahce-tasarimi/index.html" class="product-card__cta">Detaylı İncele
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
           </div>
         </article>
-
-        <!-- Ürün 2 -->
-        <article class="product-card">
-          <div class="product-card__thumb">
-            <span class="product-card__badge">Özel Tasarım</span>
-            <picture>
-              <source srcset="assets/img/yastik-yosunu-tablo.webp" type="image/webp">
-              <img src="assets/img/yastik-yosunu-tablo.jpg" alt="Yuvarlak masif ceviz yastık yosunu tablo" width="600" height="600" loading="lazy">
-            </picture>
-          </div>
-          <div class="product-card__body">
-            <span class="product-card__cat">Tablolar</span>
-            <h3 class="product-card__title">
-              <a href="./urunler/yastik-yosunu-tablo/index.html">Yastık Yosunu Tablo</a>
-            </h3>
-            <p class="product-card__desc">Üç boyutlu dolgun top yosun dokularının masif ceviz ve fırçalanmış pirinç çerçevede buluştuğu heykelsi sanat eseri.</p>
-            <div class="product-card__footer">
-              <span class="product-info__badge" style="font-size:0.8rem; color:var(--color-accent-brass); font-weight:600;">Ø 50 - 90 cm</span>
-              <a href="./urunler/yastik-yosunu-tablo/index.html" class="product-card__cta">
-                İncele
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </a>
-            </div>
+        <article class="service-card">
+          <a href="./hizmetlerimiz/yosun-duvar/index.html" class="service-card__thumb" tabindex="-1" aria-hidden="true">
+            <div class="img-slot"><img src="./assets/img/hizmetler/yosun-duvar-kapak.jpg" alt="Yosun Duvar" loading="lazy" onerror="this.remove()"><span class="img-slot__label">Görsel alanı<small>hizmetler/yosun-duvar-kapak.jpg</small></span></div>
+          </a>
+          <div class="service-card__body">
+            <h3 class="service-card__title"><a href="./hizmetlerimiz/yosun-duvar/index.html">Yosun Duvar</a></h3>
+            <p>Bakım gerektirmeyen stabilize yosunlarla akustik konfor sağlayan, mekana prestij katan özel tasarım yosun duvarlar.</p>
+            <a href="./hizmetlerimiz/yosun-duvar/index.html" class="product-card__cta">Detaylı İncele
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
           </div>
         </article>
-
-        <!-- Ürün 3 -->
-        <article class="product-card">
-          <div class="product-card__thumb">
-            <span class="product-card__badge">Botanik Koleksiyon</span>
-            <picture>
-              <source srcset="assets/img/terraryum-yosunu-seti.webp" type="image/webp">
-              <img src="assets/img/terraryum-yosunu-seti.jpg" alt="Ahşap kutulu lüks stabilize terraryum yosun seti" width="600" height="600" loading="lazy">
-            </picture>
+        <article class="service-card">
+          <a href="./hizmetlerimiz/ic-mekan-peyzaj-tasarimi/index.html" class="service-card__thumb" tabindex="-1" aria-hidden="true">
+            <div class="img-slot"><img src="./assets/img/hizmetler/ic-mekan-peyzaj-tasarimi-kapak.jpg" alt="İç Mekan Peyzaj Tasarımı" loading="lazy" onerror="this.remove()"><span class="img-slot__label">Görsel alanı<small>hizmetler/ic-mekan-peyzaj-tasarimi-kapak.jpg</small></span></div>
+          </a>
+          <div class="service-card__body">
+            <h3 class="service-card__title"><a href="./hizmetlerimiz/ic-mekan-peyzaj-tasarimi/index.html">İç Mekan Peyzaj Tasarımı</a></h3>
+            <p>Ofisten otele, çalışma ve yaşam alanlarını biyofilik tasarım anlayışıyla bitkilendirerek daha huzurlu mekanlar oluşturuyoruz.</p>
+            <a href="./hizmetlerimiz/ic-mekan-peyzaj-tasarimi/index.html" class="product-card__cta">Detaylı İncele
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
           </div>
-          <div class="product-card__body">
-            <span class="product-card__cat">Setler</span>
-            <h3 class="product-card__title">
-              <a href="./urunler/terraryum-yosunu-seti/index.html">Terraryum Yosunu Seti</a>
-            </h3>
-            <p class="product-card__desc">Botanik meraklıları ve iç mekan aksanları için özenle seçilmiş 4 çeşit mini dağ yosunu ve liken koleksiyon sandığı.</p>
-            <div class="product-card__footer">
-              <span class="product-info__badge" style="font-size:0.8rem; color:var(--color-accent-brass); font-weight:600;">Ahşap Sandık Hediyeli</span>
-              <a href="./urunler/terraryum-yosunu-seti/index.html" class="product-card__cta">
-                İncele
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </a>
-            </div>
+        </article>
+        <article class="service-card">
+          <a href="./hizmetlerimiz/bonsai-agac/index.html" class="service-card__thumb" tabindex="-1" aria-hidden="true">
+            <div class="img-slot"><img src="./assets/img/hizmetler/bonsai-agac-kapak.jpg" alt="Bonsai Ağaç" loading="lazy" onerror="this.remove()"><span class="img-slot__label">Görsel alanı<small>hizmetler/bonsai-agac-kapak.jpg</small></span></div>
+          </a>
+          <div class="service-card__body">
+            <h3 class="service-card__title"><a href="./hizmetlerimiz/bonsai-agac/index.html">Bonsai Ağaç</a></h3>
+            <p>El işçiliğiyle hazırlanan, bakım gerektirmeyen dekoratif bonsai ağaçlarla iç mekanlara karakter katıyoruz.</p>
+            <a href="./hizmetlerimiz/bonsai-agac/index.html" class="product-card__cta">Detaylı İncele
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </article>
+        <article class="service-card">
+          <a href="./hizmetlerimiz/el-yapimi-dekoratif-agaclar/index.html" class="service-card__thumb" tabindex="-1" aria-hidden="true">
+            <div class="img-slot"><img src="./assets/img/hizmetler/el-yapimi-dekoratif-agaclar-kapak.jpg" alt="El Yapımı Dekoratif Ağaçlar" loading="lazy" onerror="this.remove()"><span class="img-slot__label">Görsel alanı<small>hizmetler/el-yapimi-dekoratif-agaclar-kapak.jpg</small></span></div>
+          </a>
+          <div class="service-card__body">
+            <h3 class="service-card__title"><a href="./hizmetlerimiz/el-yapimi-dekoratif-agaclar/index.html">El Yapımı Dekoratif Ağaçlar</a></h3>
+            <p>Mimari projelere özel ölçüde üretilen, gerçekçi görünümlü el yapımı dekoratif ağaçlarla etkileyici mekanlar oluşturuyoruz.</p>
+            <a href="./hizmetlerimiz/el-yapimi-dekoratif-agaclar/index.html" class="product-card__cta">Detaylı İncele
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </article>
+        <article class="service-card">
+          <a href="./hizmetlerimiz/toptan-satis/index.html" class="service-card__thumb" tabindex="-1" aria-hidden="true">
+            <div class="img-slot"><img src="./assets/img/hizmetler/toptan-satis-kapak.jpg" alt="Toptan Satış" loading="lazy" onerror="this.remove()"><span class="img-slot__label">Görsel alanı<small>hizmetler/toptan-satis-kapak.jpg</small></span></div>
+          </a>
+          <div class="service-card__body">
+            <h3 class="service-card__title"><a href="./hizmetlerimiz/toptan-satis/index.html">Toptan Satış</a></h3>
+            <p>Mimarlar, peyzaj firmaları, floristler ve mağazalar için toptan stabilize yosun ve yosun tablo tedariki sağlıyoruz.</p>
+            <a href="./hizmetlerimiz/toptan-satis/index.html" class="product-card__cta">Detaylı İncele
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
           </div>
         </article>
       </div>
 
       <div style="text-align: center; margin-top: 3.5rem;">
-        <a href="./urunler/index.html" class="btn btn-secondary">Tüm Koleksiyonu Görüntüle</a>
+        <a href="./hizmetlerimiz/index.html" class="btn btn-secondary">Tüm Hizmetlerimiz</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2b. Mağazadan Öne Çıkanlar -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="eyebrow">MAĞAZA</span>
+        <h2>Mağazadan Öne Çıkanlar</h2>
+        <div class="brass-line"></div>
+        <p>Bakım gerektirmeyen stabilize yosun tablolar, botanik setler ve dekoratif bonsai ağaçlar.</p>
+      </div>
+
+      <div class="products-grid shop-grid">
+        <article class="product-card shop-card" data-cat="yosun" data-price="3500.00" data-order="0">
+          <div class="product-card__thumb">
+            <div class="img-slot"><img src="./assets/img/magaza/yuvarlak-stabilize-yosun-ve-bitki-tablosu-03.jpg" alt="Yuvarlak Stabilize Yosun ve Bitki Tablosu 03" loading="lazy" onerror="this.remove()"><span class="img-slot__label">Görsel alanı<small>magaza/yuvarlak-stabilize-yosun-ve-bitki-tablosu-03.jpg</small></span></div>
+          </div>
+          <div class="product-card__body">
+            <span class="product-card__cat">Yosun Tablolar</span>
+            <h3 class="product-card__title">Yuvarlak Stabilize Yosun ve Bitki Tablosu 03</h3>
+            <div class="shop-card__price">₺3.500,00</div>
+            <span class="shop-card__note">Ölçü ve çerçeve seçenekleri mevcut</span>
+            <a href="https://wa.me/905324866767?text=Merhaba%2C%20Yuvarlak%20Stabilize%20Yosun%20ve%20Bitki%20Tablosu%2003%20%28%E2%82%BA3.500%2C00%29%20%C3%BCr%C3%BCn%C3%BC%20hakk%C4%B1nda%20bilgi%20almak%20ve%20sipari%C5%9F%20vermek%20istiyorum." class="btn btn-whatsapp shop-card__btn" target="_blank" rel="noopener noreferrer">WhatsApp ile Sipariş</a>
+          </div>
+        </article>
+        <article class="product-card shop-card" data-cat="bonsai" data-price="27720.00" data-order="2">
+          <div class="product-card__thumb">
+            <div class="img-slot"><img src="./assets/img/magaza/bonsai-agac-01.jpg" alt="Bonsai Ağaç 01" loading="lazy" onerror="this.remove()"><span class="img-slot__label">Görsel alanı<small>magaza/bonsai-agac-01.jpg</small></span></div>
+          </div>
+          <div class="product-card__body">
+            <span class="product-card__cat">Bonsai Ağaçlar</span>
+            <h3 class="product-card__title">Bonsai Ağaç 01</h3>
+            <div class="shop-card__price">₺27.720,00</div>
+            <span class="shop-card__note">Hazır ürün</span>
+            <a href="https://wa.me/905324866767?text=Merhaba%2C%20Bonsai%20A%C4%9Fa%C3%A7%2001%20%28%E2%82%BA27.720%2C00%29%20%C3%BCr%C3%BCn%C3%BC%20hakk%C4%B1nda%20bilgi%20almak%20ve%20sipari%C5%9F%20vermek%20istiyorum." class="btn btn-whatsapp shop-card__btn" target="_blank" rel="noopener noreferrer">WhatsApp ile Sipariş</a>
+          </div>
+        </article>
+        <article class="product-card shop-card" data-cat="yosun" data-price="13850.00" data-order="3">
+          <div class="product-card__thumb">
+            <div class="img-slot"><img src="./assets/img/magaza/dogal-dal-detayli-yosun-tablo.jpg" alt="Doğal Dal Detaylı Yosun Tablo" loading="lazy" onerror="this.remove()"><span class="img-slot__label">Görsel alanı<small>magaza/dogal-dal-detayli-yosun-tablo.jpg</small></span></div>
+          </div>
+          <div class="product-card__body">
+            <span class="product-card__cat">Yosun Tablolar</span>
+            <h3 class="product-card__title">Doğal Dal Detaylı Yosun Tablo</h3>
+            <div class="shop-card__price">₺13.850,00</div>
+            <span class="shop-card__note">Ölçü ve çerçeve seçenekleri mevcut</span>
+            <a href="https://wa.me/905324866767?text=Merhaba%2C%20Do%C4%9Fal%20Dal%20Detayl%C4%B1%20Yosun%20Tablo%20%28%E2%82%BA13.850%2C00%29%20%C3%BCr%C3%BCn%C3%BC%20hakk%C4%B1nda%20bilgi%20almak%20ve%20sipari%C5%9F%20vermek%20istiyorum." class="btn btn-whatsapp shop-card__btn" target="_blank" rel="noopener noreferrer">WhatsApp ile Sipariş</a>
+          </div>
+        </article>
+        <article class="product-card shop-card" data-cat="set" data-price="17450.00" data-order="15">
+          <div class="product-card__thumb">
+            <div class="img-slot"><img src="./assets/img/magaza/kare-botanik-yosun-tablo-3lu-set.jpg" alt="Kare Botanik Yosun Tablo-3’lü Set" loading="lazy" onerror="this.remove()"><span class="img-slot__label">Görsel alanı<small>magaza/kare-botanik-yosun-tablo-3lu-set.jpg</small></span></div>
+          </div>
+          <div class="product-card__body">
+            <span class="product-card__cat">Setler</span>
+            <h3 class="product-card__title">Kare Botanik Yosun Tablo-3’lü Set</h3>
+            <div class="shop-card__price">₺17.450,00</div>
+            <span class="shop-card__note">Hazır ürün</span>
+            <a href="https://wa.me/905324866767?text=Merhaba%2C%20Kare%20Botanik%20Yosun%20Tablo-3%E2%80%99l%C3%BC%20Set%20%28%E2%82%BA17.450%2C00%29%20%C3%BCr%C3%BCn%C3%BC%20hakk%C4%B1nda%20bilgi%20almak%20ve%20sipari%C5%9F%20vermek%20istiyorum." class="btn btn-whatsapp shop-card__btn" target="_blank" rel="noopener noreferrer">WhatsApp ile Sipariş</a>
+          </div>
+        </article>
+      </div>
+
+      <div style="text-align: center; margin-top: 3.5rem;">
+        <a href="./magaza/index.html" class="btn btn-secondary">Mağazanın Tamamını Görüntüle</a>
       </div>
     </div>
   </section>
 
   <!-- 3. Değer Önerisi / Marka Vaadi (3 Sütun) -->
-  <section class="section">
+  <section class="section section--surface">
     <div class="container">
       <div class="section-header text-center">
         <span class="eyebrow">ELIVA MOSS FARKI</span>
@@ -397,7 +480,7 @@
           </div>
 
           <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-            <a href="./kurumsal-yosun-duvar/index.html" class="btn btn-primary">Proje Detaylarını İncele</a>
+            <a href="./hizmetlerimiz/yosun-duvar/index.html" class="btn btn-primary">Proje Detaylarını İncele</a>
             <a href="https://wa.me/905324866767?text=Merhaba,%20kurumsal%20yosun%20duvar%20projemiz%20için%20görüşmek%20istiyoruz." class="btn btn-secondary-light" target="_blank" rel="noopener noreferrer">
               Proje Danışmanlığı Al
             </a>
@@ -611,12 +694,15 @@
         </div>
 
         <div>
-          <h4 class="footer-heading">Koleksiyon</h4>
+          <h4 class="footer-heading">Hizmetlerimiz</h4>
           <ul class="footer-links">
-            <li><a href="./urunler/stabilize-yosun-pano/index.html" class="footer-link">Stabilize Yosun Pano</a></li>
-            <li><a href="./urunler/yastik-yosunu-tablo/index.html" class="footer-link">Yastık Yosunu Tablo</a></li>
-            <li><a href="./urunler/terraryum-yosunu-seti/index.html" class="footer-link">Terraryum Yosunu Seti</a></li>
-            <li><a href="./kurumsal-yosun-duvar/index.html" class="footer-link">Kurumsal Duvar Projeleri</a></li>
+            <li><a href="./hizmetlerimiz/dikey-bahce-tasarimi/index.html" class="footer-link">Dikey Bahçe Tasarımı</a></li>
+            <li><a href="./hizmetlerimiz/yosun-duvar/index.html" class="footer-link">Yosun Duvar</a></li>
+            <li><a href="./hizmetlerimiz/ic-mekan-peyzaj-tasarimi/index.html" class="footer-link">İç Mekan Peyzaj Tasarımı</a></li>
+            <li><a href="./hizmetlerimiz/bonsai-agac/index.html" class="footer-link">Bonsai Ağaç</a></li>
+            <li><a href="./hizmetlerimiz/el-yapimi-dekoratif-agaclar/index.html" class="footer-link">El Yapımı Dekoratif Ağaçlar</a></li>
+            <li><a href="./hizmetlerimiz/toptan-satis/index.html" class="footer-link">Toptan Satış</a></li>
+            <li><a href="./magaza/index.html" class="footer-link">Mağaza</a></li>
           </ul>
         </div>
 
@@ -662,7 +748,7 @@
   </a>
 
   <!-- JavaScript -->
-  <script src="assets/js/main.js?v=20261011" defer></script>
+  <script src="assets/js/main.js?v=20261011f" defer></script>
   <script src="assets/js/interactive-moss.js?v=20261011e" defer></script>
 </body>
 </html>

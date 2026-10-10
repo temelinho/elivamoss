@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initFaqAccordion();
   initGallery();
+  initShop();
 });
 
 /* 1. Header Scroll Efekti */
@@ -134,4 +135,45 @@ function initGallery() {
       if (label) mainImg.alt = label;
     });
   });
+}
+
+/* 5. Mağaza: kategori filtresi ve fiyat sıralaması */
+function initShop() {
+  const grid = document.getElementById('shop-grid');
+  if (!grid) return;
+  const cards = Array.from(grid.querySelectorAll('.shop-card'));
+  const filters = document.querySelectorAll('.shop-filter');
+  const sortSel = document.getElementById('shop-sort');
+  const countEl = document.querySelector('.shop-count strong');
+  let current = 'all';
+
+  const apply = () => {
+    let visible = 0;
+    cards.forEach(card => {
+      const show = current === 'all' || card.dataset.cat === current;
+      card.classList.toggle('is-hidden', !show);
+      if (show) visible++;
+    });
+    if (countEl) countEl.textContent = visible;
+
+    const mode = sortSel ? sortSel.value : 'default';
+    const sorted = cards.slice().sort((a, b) => {
+      if (mode === 'price-asc') return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+      if (mode === 'price-desc') return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+      return parseInt(a.dataset.order, 10) - parseInt(b.dataset.order, 10);
+    });
+    sorted.forEach(card => grid.appendChild(card));
+  };
+
+  filters.forEach(btn => {
+    btn.addEventListener('click', () => {
+      current = btn.dataset.filter;
+      filters.forEach(b => {
+        b.classList.toggle('active', b === btn);
+        b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+      });
+      apply();
+    });
+  });
+  if (sortSel) sortSel.addEventListener('change', apply);
 }
