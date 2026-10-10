@@ -133,11 +133,14 @@
         vec2 displacedUv = uv + bulgeOffset + dragOffset;
         displacedUv = clamp(displacedUv, 0.001, 0.999);
 
-        // 4b. Gerçek derinlik: bakış açısına göre katmanlar farklı hızda kayar
+        // 4b. Gerçek derinlik: bakış açısına göre katmanlar farklı hızda kayar.
+        // Yosun fotoğrafı çerçevenin altına taşacak kadar hafif büyütülür: en uç açıda bile kenarda boşluk kalmaz.
+        bool insideFrame = all(greaterThan(uv, uInner.xy)) && all(lessThan(uv, uInner.zw));
+        if (insideFrame) {
+          displacedUv = vec2(0.5) + (displacedUv - vec2(0.5)) * 0.885;
+        }
         displacedUv = clamp(parallaxUv(displacedUv), 0.001, 0.999);
         float h = heightAt(displacedUv);
-        bool insideFrame = all(greaterThan(uv, uInner.xy)) && all(lessThan(uv, uInner.zw));
-        if (!insideFrame) gEdge = 0.0;
 
         // Ana Doku Örnekleme
         vec4 color = texture2D(uTexture, displacedUv);
@@ -159,8 +162,19 @@
         color.rgb += vec3(relief * 0.10 * inMoss);
 
         // 7. Çerçevenin iç duvarı: bakış açısı yana kaydıkça kenarda yumuşak gölge
-        float wall = smoothstep(0.0, 0.004, gEdge);
-        color.rgb = mix(color.rgb * (1.0 - clamp(gEdge * 30.0, 0.0, 0.45)), vec3(0.035, 0.045, 0.032), wall);
+        if (insideFrame) {
+          // Çerçevenin yosun üzerine düşen yumuşak iç gölgesi; bakış yönüne göre bir kenarda genişler
+          float dL = uv.x - uInner.x;
+          float dR = uInner.z - uv.x;
+          float dT = (uv.y - uInner.y) * uAspect;
+          float dB = (uInner.w - uv.y) * uAspect;
+          float sh = 1.0;
+          sh *= mix(0.55, 1.0, smoothstep(0.0, 0.022 + max(0.0, -uTilt.x) * 0.03, dL));
+          sh *= mix(0.55, 1.0, smoothstep(0.0, 0.022 + max(0.0,  uTilt.x) * 0.03, dR));
+          sh *= mix(0.55, 1.0, smoothstep(0.0, 0.022 + max(0.0, -uTilt.y) * 0.03, dT));
+          sh *= mix(0.55, 1.0, smoothstep(0.0, 0.022 + max(0.0,  uTilt.y) * 0.03, dB));
+          color.rgb *= sh;
+        }
 
         gl_FragColor = color;
       }
