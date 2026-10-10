@@ -107,19 +107,31 @@ function initFaqAccordion() {
 
 /* 4. Ürün Galerisi */
 function initGallery() {
-  const mainImg = document.querySelector('.product-gallery__main img');
+  const main = document.querySelector('.product-gallery__main');
   const thumbs = document.querySelectorAll('.product-gallery__thumb');
+  if (!main || !thumbs.length) return;
 
-  if (!mainImg || !thumbs.length) return;
+  const mainImg = main.querySelector('img');
+  const mainSource = main.querySelector('picture source[type="image/webp"]');
+  if (!mainImg) return;
 
   thumbs.forEach(thumb => {
     thumb.addEventListener('click', () => {
-      thumbs.forEach(t => t.classList.remove('active'));
+      const base = thumb.getAttribute('data-full');
+      if (!base) return;
+
+      thumbs.forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-pressed', 'false');
+      });
       thumb.classList.add('active');
-      const newSrc = thumb.getAttribute('data-full');
-      if (newSrc) {
-        mainImg.src = newSrc;
-      }
+      thumb.setAttribute('aria-pressed', 'true');
+
+      // <picture> içindeki WebP kaynağı da güncellenmeli, yoksa tarayıcı eski görseli göstermeye devam eder
+      if (mainSource) mainSource.srcset = base + '.webp';
+      mainImg.src = base + '.jpg';
+      const label = thumb.getAttribute('aria-label');
+      if (label) mainImg.alt = label;
     });
   });
 }

@@ -22,7 +22,7 @@
   <meta name="twitter:image" content="https://elivamoss.com.tr/og-image.jpg">
 
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261011">
 
   <!-- Yapılandırılmış Veri: Organization Schema -->
   <script type="application/ld+json">
@@ -200,7 +200,10 @@
             <canvas id="moss-canvas" class="moss-interactive-canvas"></canvas>
 
             <!-- Statik Görsel (WebGL Desteksiz / Yükleme Sırasında Görünür) -->
-            <img src="assets/img/hero-moss-interactive.webp" alt="Pirinç çerçeveli interaktif dokunsal yosun panosu" class="moss-frame-fallback" width="800" height="800" loading="eager" fetchpriority="high">
+            <picture>
+              <source srcset="assets/img/hero-moss-tall.webp" type="image/webp">
+              <img src="assets/img/hero-moss-tall.jpg" alt="Pirinç çerçeveli interaktif dokunsal yosun panosu" class="moss-frame-fallback" width="800" height="1200" loading="eager">
+            </picture>
 
             <!-- İnteraktif İpucu Rozeti (Floating Badge) -->
             <div class="moss-hint-badge" id="moss-hint-badge" role="status" aria-live="polite">
@@ -659,7 +662,7 @@
   </a>
 
   <!-- JavaScript -->
-  <script src="assets/js/main.js" defer></script>
-  <script src="assets/js/interactive-moss.js" defer></script>
+  <script src="assets/js/main.js?v=20261011" defer></script>
+  <script src="assets/js/interactive-moss.js?v=20261011b" defer></script>
 </body>
 </html>

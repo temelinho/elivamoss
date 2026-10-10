@@ -54,12 +54,51 @@
       uniform sampler2D uTexture;     // Yosun & Çerçeve Görseli
       uniform sampler2D uMask;        // Maske: Çerçeve=0, Yosunlar>0
       uniform sampler2D uNormal;      // Yüzey Normalleri (3D Işık)
+      uniform sampler2D uDepth;       // Yükseklik Haritası: Çerçeve=1 (önde), yosun 0.04-0.70 (gömülü)
+      uniform vec2 uTilt;            // Bakış açısı eğimi (-1..1): fare / telefon eğimi
+      uniform float uDepthScale;     // Derinlik (parallax) şiddeti
+      uniform vec4 uInner;           // Çerçeve iç alanı (minX, minY, maxX, maxY) UV
+
+      float gEdge = 0.0;             // Işın çerçeve duvarına ne kadar dayandı (iç duvar gölgesi)
 
       uniform vec2 uTouch;           // Dokunulan nokta (UV 0..1)
       uniform float uBulge;          // Kabarma yay şiddeti (0..1)
       uniform vec2 uVelocity;        // Sürükleme yönü ve hızı (dx, dy)
       uniform float uTime;           // Zaman (Organik nefes alma dalgası)
       uniform float uRadius;         // Kabarma yarıçapı
+      uniform float uAspect;         // Canvas yükseklik / genişlik oranı (dikey çerçeve)
+
+      float heightAt(vec2 p) {
+        return texture2D(uDepth, p).r;
+      }
+
+      // Parallax Occlusion Mapping: bakış ışını katman katman ilerler, ilk çarptığı yüzeyi bulur.
+      // Böylece öndeki yosun topları arkadakileri örter, çerçeve kenarı içteki yosunu gizler.
+      vec2 parallaxUv(vec2 uv) {
+        vec2 dir = uTilt * uDepthScale * vec2(1.0, 1.0 / uAspect);
+        const int STEPS = 24;
+        float dl = 1.0 / float(STEPS);
+        float layer = 1.0;
+        vec2 p = uv;
+        vec2 prevP = uv;
+        float prevDiff = 0.0;
+        for (int i = 0; i < STEPS; i++) {
+          float diff = heightAt(p) - layer;
+          if (diff >= 0.0) {
+            float w = diff / (diff - prevDiff + 0.00001);
+            return mix(p, prevP, w);
+          }
+          prevP = p;
+          prevDiff = diff;
+          layer -= dl;
+          p = uv + dir * (1.0 - layer);
+          // Yosun çerçevenin altına doğru devam eder: ışını iç alanda tut, taşmayı duvar gölgesi say
+          vec2 cp = clamp(p, uInner.xy, uInner.zw);
+          gEdge = max(gEdge, length((p - cp) * vec2(1.0, uAspect)));
+          p = cp;
+        }
+        return p;
+      }
 
       void main() {
         vec2 uv = vUv;
@@ -69,7 +108,8 @@
 
         // 1. Dokunulan Noktaya Uzaklık
         vec2 delta = uv - uTouch;
-        float dist = length(delta);
+        // Dikey çerçevede kabarma elips değil, tam daire kalsın
+        float dist = length(delta * vec2(1.0, uAspect));
 
         // 2. Doğal Kubbe Eğrisi (Pofuduk tepe/kabarma, sıfır sarmal)
         float influence = 0.0;
@@ -93,6 +133,12 @@
         vec2 displacedUv = uv + bulgeOffset + dragOffset;
         displacedUv = clamp(displacedUv, 0.001, 0.999);
 
+        // 4b. Gerçek derinlik: bakış açısına göre katmanlar farklı hızda kayar
+        displacedUv = clamp(parallaxUv(displacedUv), 0.001, 0.999);
+        float h = heightAt(displacedUv);
+        bool insideFrame = all(greaterThan(uv, uInner.xy)) && all(lessThan(uv, uInner.zw));
+        if (!insideFrame) gEdge = 0.0;
+
         // Ana Doku Örnekleme
         vec4 color = texture2D(uTexture, displacedUv);
 
@@ -104,6 +150,17 @@
         // Kabardıkça ışık vurgusunu ve derinlik gölgesini güçlendir
         float lightEffect = bulgeFactor * 1.6;
         color.rgb += vec3(diffLight * 0.15 * lightEffect);
+
+        // 6. Derinlik gölgesi (çukurlar hafif koyu) ve bakış açısıyla kayan yumuşak ışık
+        float inMoss = step(h, 0.95);
+        color.rgb *= mix(1.0, mix(0.80, 1.06, smoothstep(0.04, 0.70, h)), inMoss);
+        vec3 tiltLight = normalize(vec3(-uTilt.x * 0.8 - 0.35, uTilt.y * 0.8 + 0.45, 0.9));
+        float relief = dot(normal, tiltLight) - 0.55;
+        color.rgb += vec3(relief * 0.10 * inMoss);
+
+        // 7. Çerçevenin iç duvarı: bakış açısı yana kaydıkça kenarda yumuşak gölge
+        float wall = smoothstep(0.0, 0.004, gEdge);
+        color.rgb = mix(color.rgb * (1.0 - clamp(gEdge * 30.0, 0.0, 0.45)), vec3(0.035, 0.045, 0.032), wall);
 
         gl_FragColor = color;
       }
@@ -171,11 +228,29 @@
     const uVelocityLoc = gl.getUniformLocation(program, 'uVelocity');
     const uTimeLoc = gl.getUniformLocation(program, 'uTime');
     const uRadiusLoc = gl.getUniformLocation(program, 'uRadius');
+    const uAspectLoc = gl.getUniformLocation(program, 'uAspect');
+    const uDepthLoc = gl.getUniformLocation(program, 'uDepth');
+    const uTiltLoc = gl.getUniformLocation(program, 'uTilt');
+    const uDepthScaleLoc = gl.getUniformLocation(program, 'uDepthScale');
 
     gl.uniform1i(uTextureLoc, 0);
     gl.uniform1i(uMaskLoc, 1);
     gl.uniform1i(uNormalLoc, 2);
     gl.uniform1f(uRadiusLoc, 0.28);
+    gl.uniform1f(uAspectLoc, 1.5);
+    gl.uniform1i(uDepthLoc, 3);
+    gl.uniform1f(uDepthScaleLoc, 0.05);
+    // Pirinç çerçeve kalınlığı: 800x1200 dokuda 40px (+3px pay: doku filtrelemesi pirinci karıştırmasın)
+    gl.uniform4f(gl.getUniformLocation(program, 'uInner'), 43 / 800, 43 / 1200, 1 - 43 / 800, 1 - 43 / 1200);
+
+    // Dokular yüklenene kadar canvas gizli: statik görsel görünür, düz yeşil kare görünmez
+    canvas.style.opacity = '0';
+    canvas.style.transition = 'opacity 0.5s ease';
+    let texturesReady = 0;
+    function onTextureReady() {
+      texturesReady += 1;
+      if (texturesReady === 4) canvas.style.opacity = '1';
+    }
 
     // Texture Yükleyici
     function loadTexture(gl, url, unit) {
@@ -190,7 +265,7 @@
       );
 
       const image = new Image();
-      if (window.location.protocol !== 'file:') {
+      if (window.location.protocol !== 'file:' && url.indexOf('data:') !== 0) {
         image.crossOrigin = 'anonymous';
       }
       image.onload = function () {
@@ -202,13 +277,14 @@
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          onTextureReady();
         } catch (err) {
           console.warn('Doku WebGL aktarım uyarısı:', err);
         }
       };
       image.onerror = function () {
-        if (url.endsWith('.webp')) {
-          image.src = url.replace('.webp', unit === 1 || unit === 2 ? '.png' : '.jpg');
+        if (url.indexOf('data:') !== 0 && image.src.endsWith('.webp')) {
+          image.src = url.replace('.webp', unit === 0 ? '.jpg' : '.png');
         }
       };
       image.src = url;
@@ -216,9 +292,30 @@
     }
 
     // Görselleri Bağla (Modern WebP, destek yoksa JPG/PNG)
-    loadTexture(gl, 'assets/img/hero-moss-interactive.webp', 0);
-    loadTexture(gl, 'assets/img/hero-moss-mask.webp', 1);
-    loadTexture(gl, 'assets/img/hero-moss-normal.webp', 2);
+    function loadAllTextures(t) {
+      loadTexture(gl, t.color, 0);
+      loadTexture(gl, t.mask, 1);
+      loadTexture(gl, t.normal, 2);
+      loadTexture(gl, t.depth, 3);
+    }
+
+    if (window.location.protocol === 'file:') {
+      // Dosyaya çift tıklanarak açıldığında tarayıcı yerel görselleri WebGL'e vermez (güvenlik).
+      // Bu durumda dokular gömülü veri (data URI) olarak ayrı bir dosyadan yüklenir.
+      const s = document.createElement('script');
+      s.src = 'assets/js/hero-moss-textures.js?v=3';
+      s.onload = function () {
+        if (window.ELIVA_MOSS_TEXTURES) loadAllTextures(window.ELIVA_MOSS_TEXTURES);
+      };
+      document.head.appendChild(s);
+    } else {
+      loadAllTextures({
+        color: 'assets/img/hero-moss-tall.webp',
+        mask: 'assets/img/hero-moss-tall-mask.webp',
+        normal: 'assets/img/hero-moss-tall-normal.webp',
+        depth: 'assets/img/hero-moss-tall-depth.webp'
+      });
+    }
 
     // --- FİZİK VE ETKİLEŞİM DURUMU ---
     let touchX = 0.5;
@@ -241,6 +338,13 @@
     let lastEventX = 0;
     let lastEventY = 0;
 
+    // Derinlik bakış açısı (parallax tilt)
+    let tiltX = 0.0, tiltY = 0.0;
+    let targetTiltX = 0.0, targetTiltY = 0.0;
+    let lastTiltInputTime = -99999;
+    let gyroActive = false;
+    let gyroBaseBeta = null, gyroBaseGamma = null;
+
     // Yay Sabitleri (Doğal, süngerimsi organik hissiyat)
     const STIFFNESS = 0.22;
     const DAMPING = 0.76;
@@ -252,14 +356,18 @@
       const width = Math.round(rect.width * dpr);
       const height = Math.round(rect.height * dpr);
 
-      if (canvas.width !== width || canvas.height !== height) {
+      if (width > 0 && height > 0 && (canvas.width !== width || canvas.height !== height)) {
         canvas.width = width;
         canvas.height = height;
         gl.viewport(0, 0, width, height);
+        if (rect.width > 0) gl.uniform1f(uAspectLoc, rect.height / rect.width);
       }
     }
 
     window.addEventListener('resize', resizeCanvas, { passive: true });
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(resizeCanvas).observe(container);
+    }
     resizeCanvas();
 
     // Koordinat Dönüştürücü (Client Pixel -> UV 0..1)
@@ -278,6 +386,53 @@
       if (badge && !badge.classList.contains('badge--hidden')) {
         badge.classList.add('badge--hidden');
       }
+    }
+
+    // --- DERİNLİK: FARE KONUMU (Masaüstü — sayfanın her yerinden) ---
+    window.addEventListener('mousemove', function (e) {
+      const rect = container.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const rx = Math.max(window.innerWidth * 0.5, 1);
+      const ry = Math.max(window.innerHeight * 0.5, 1);
+      targetTiltX = Math.max(-1, Math.min(1, (e.clientX - cx) / rx));
+      targetTiltY = Math.max(-1, Math.min(1, (e.clientY - cy) / ry));
+      lastTiltInputTime = performance.now();
+    }, { passive: true });
+
+    // --- DERİNLİK: TELEFON EĞİMİ (Jiroskop) ---
+    function onOrientation(e) {
+      if (e.beta === null || e.gamma === null) return;
+      if (gyroBaseBeta === null) { gyroBaseBeta = e.beta; gyroBaseGamma = e.gamma; }
+      // Başlangıç tutuşuna göre fark: ±25 derece tam etki
+      targetTiltX = Math.max(-1, Math.min(1, (e.gamma - gyroBaseGamma) / 25));
+      targetTiltY = Math.max(-1, Math.min(1, (e.beta - gyroBaseBeta) / 25));
+      // Taban açısı yavaşça yeni tutuşa uyum sağlasın
+      gyroBaseBeta += (e.beta - gyroBaseBeta) * 0.01;
+      gyroBaseGamma += (e.gamma - gyroBaseGamma) * 0.01;
+      gyroActive = true;
+      lastTiltInputTime = performance.now();
+    }
+
+    function enableGyro() {
+      if (typeof DeviceOrientationEvent === 'undefined') return;
+      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        // iOS: izin sadece kullanıcı dokunuşuyla istenebilir
+        DeviceOrientationEvent.requestPermission().then(function (state) {
+          if (state === 'granted') window.addEventListener('deviceorientation', onOrientation, { passive: true });
+        }).catch(function () {});
+      } else {
+        window.addEventListener('deviceorientation', onOrientation, { passive: true });
+      }
+    }
+
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission !== 'function') {
+      enableGyro();
+    } else {
+      container.addEventListener('touchend', function askOnce() {
+        container.removeEventListener('touchend', askOnce);
+        enableGyro();
+      });
     }
 
     // --- FARE / DESKTOP ETKİLEŞİMLERİ ---
@@ -377,6 +532,11 @@
         userHasInteracted = true;
         lastUserInteractionTime = performance.now();
         targetBulge = 1.45;
+        if (!gyroActive) {
+          targetTiltX = (uv.x - 0.5) * 1.6;
+          targetTiltY = (uv.y - 0.5) * 1.6;
+          lastTiltInputTime = performance.now();
+        }
         hideBadge();
       }
     }, { passive: true });
@@ -418,6 +578,15 @@
         targetVelY = -Math.sin(t * 1.8) * 0.24 * 0.35;
       }
 
+      // 0b. Bakış açısı: girdi yoksa yavaş, sakin bir salınım (derinlik kendiliğinden görünsün)
+      if (currentTime - lastTiltInputTime > 3000) {
+        const tt = elapsedSeconds * 0.55;
+        targetTiltX = Math.sin(tt) * 0.75;
+        targetTiltY = Math.sin(tt * 0.7 + 1.3) * 0.5;
+      }
+      tiltX += (targetTiltX - tiltX) * 0.07;
+      tiltY += (targetTiltY - tiltY) * 0.07;
+
       // 1. Dokunma Noktası Yumuşatma (Lerp)
       touchX += (targetTouchX - touchX) * 0.18;
       touchY += (targetTouchY - touchY) * 0.18;
@@ -433,22 +602,53 @@
       targetVelX *= 0.86;
       targetVelY *= 0.86;
 
-      // Boyut kontrolü
-      resizeCanvas();
-
       // Shader Uniform Değerlerini Güncelle
       gl.uniform2f(uTouchLoc, touchX, touchY);
       gl.uniform1f(uBulgeLoc, currentBulge);
       gl.uniform2f(uVelocityLoc, currentVelX, currentVelY);
       gl.uniform1f(uTimeLoc, elapsedSeconds);
+      gl.uniform2f(uTiltLoc, tiltX, tiltY);
 
       // Çizim
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-      requestAnimationFrame(render);
+      rafId = isRunning ? requestAnimationFrame(render) : 0;
     }
 
-    requestAnimationFrame(render);
+    // Ekran dışındayken veya sekme arka plandayken döngüyü durdur (pil ve CPU tasarrufu)
+    let rafId = 0;
+    let isRunning = false;
+    let isOnScreen = true;
+
+    function updateLoop() {
+      const shouldRun = isOnScreen && !document.hidden;
+      if (shouldRun && !isRunning) {
+        isRunning = true;
+        rafId = requestAnimationFrame(render);
+      } else if (!shouldRun && isRunning) {
+        isRunning = false;
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+    }
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        isOnScreen = entries[0].isIntersecting;
+        updateLoop();
+      }, { threshold: 0 }).observe(container);
+    }
+    document.addEventListener('visibilitychange', updateLoop);
+
+    // WebGL bağlamı kaybolursa statik görsele dön
+    canvas.addEventListener('webglcontextlost', function (e) {
+      e.preventDefault();
+      isRunning = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      canvas.style.display = 'none';
+    });
+
+    updateLoop();
   }
 
   // DOM Yüklendiğinde Başlat
