@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initFaqAccordion();
   initGallery();
   initShop();
+  initProductGallery();
 });
 
 /* 1. Header Scroll Efekti */
@@ -176,4 +177,47 @@ function initShop() {
     });
   });
   if (sortSel) sortSel.addEventListener('change', apply);
+}
+
+/* 6. Ürün sayfası galerisi: küçük resim, ok tuşları ve kaydırma */
+function initProductGallery() {
+  document.querySelectorAll('[data-gallery]').forEach(gal => {
+    const slides = Array.from(gal.querySelectorAll('.pgallery__slide'));
+    const thumbs = Array.from(gal.querySelectorAll('.pgallery__thumb'));
+    const counter = gal.querySelector('[data-current]');
+    if (!slides.length) return;
+    let current = 0;
+
+    const show = (i) => {
+      current = (i + slides.length) % slides.length;
+      slides.forEach((s, k) => s.classList.toggle('active', k === current));
+      thumbs.forEach((t, k) => {
+        t.classList.toggle('active', k === current);
+        t.setAttribute('aria-pressed', k === current ? 'true' : 'false');
+      });
+      if (counter) counter.textContent = current + 1;
+    };
+
+    thumbs.forEach((t, k) => t.addEventListener('click', () => show(k)));
+    const prev = gal.querySelector('.pgallery__nav--prev');
+    const next = gal.querySelector('.pgallery__nav--next');
+    if (prev) prev.addEventListener('click', () => show(current - 1));
+    if (next) next.addEventListener('click', () => show(current + 1));
+
+    const stage = gal.querySelector('.pgallery__stage');
+    let startX = null;
+    stage.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    stage.addEventListener('touchend', e => {
+      if (startX === null) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) > 40) show(current + (dx < 0 ? 1 : -1));
+      startX = null;
+    }, { passive: true });
+
+    gal.setAttribute('tabindex', '-1');
+    gal.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft') show(current - 1);
+      if (e.key === 'ArrowRight') show(current + 1);
+    });
+  });
 }
