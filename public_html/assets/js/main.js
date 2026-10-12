@@ -132,7 +132,7 @@ function initGallery() {
 
       // <picture> içindeki WebP kaynağı da güncellenmeli, yoksa tarayıcı eski görseli göstermeye devam eder
       if (mainSource) mainSource.srcset = base + '.webp';
-      mainImg.src = base + '.jpg';
+      mainImg.src = base + '.webp';
       const label = thumb.getAttribute('aria-label');
       if (label) mainImg.alt = label;
     });

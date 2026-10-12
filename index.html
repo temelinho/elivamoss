@@ -13,14 +13,15 @@
   <meta property="og:url" content="https://elivamoss.com.tr/">
   <meta property="og:title" content="Eliva Moss | Lüks Stabilize Dağ Yosunu Duvar Tasarımı">
   <meta property="og:description" content="Doğanın ebedi dinginliği yaşam alanlarınızda. Bakım istemeyen doğal stabilize yosun panolar ve özel mimari projeler.">
-  <meta property="og:image" content="https://elivamoss.com.tr/og-image.jpg">
+  <meta property="og:image" content="https://elivamoss.com.tr/og-image.webp">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Eliva Moss | Lüks Stabilize Dağ Yosunu Panoları">
   <meta name="twitter:description" content="Bakım gerektirmeyen, %100 doğal lüks stabilize dağ yosunu duvarları ve tabloları.">
-  <meta name="twitter:image" content="https://elivamoss.com.tr/og-image.jpg">
+  <meta name="twitter:image" content="https://elivamoss.com.tr/og-image.webp">
 
+  <link rel="preload" as="image" href="assets/img/hero-stabilize-yosun-duvar.webp" type="image/webp" fetchpriority="high">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="assets/css/styles.css?v=20261011h">
 
@@ -175,10 +176,7 @@
   <!-- 1. Hero Bölümü -->
   <section class="hero">
     <div class="hero__bg">
-      <picture>
-        <source srcset="assets/img/hero-stabilize-yosun-duvar.webp" type="image/webp">
-        <img src="assets/img/hero-stabilize-yosun-duvar.webp" alt="Lüks minimalist salonda yerden tavana stabilize yosun duvar tasarımı" width="1920" height="1080" fetchpriority="high">
-      </picture>
+      <img src="assets/img/hero-stabilize-yosun-duvar.webp" alt="Lüks minimalist salonda yerden tavana stabilize yosun duvar tasarımı" width="1280" height="714" fetchpriority="high" decoding="async">
     </div>
     <div class="hero__overlay"></div>
 
@@ -218,10 +216,7 @@
             <canvas id="moss-canvas" class="moss-interactive-canvas"></canvas>
 
             <!-- Statik Görsel (WebGL Desteksiz / Yükleme Sırasında Görünür) -->
-            <picture>
-              <source srcset="assets/img/hero-moss-tall.webp" type="image/webp">
-              <img src="assets/img/hero-moss-tall.webp" alt="Pirinç çerçeveli interaktif dokunsal yosun panosu" class="moss-frame-fallback" width="800" height="1200" loading="eager">
-            </picture>
+            <img src="assets/img/hero-moss-tall.webp" alt="Pirinç çerçeveli interaktif dokunsal yosun panosu" class="moss-frame-fallback" width="640" height="960" loading="eager" decoding="async">
 
             <!-- İnteraktif İpucu Rozeti (Floating Badge) -->
             <div class="moss-hint-badge" id="moss-hint-badge" role="status" aria-live="polite">
@@ -255,7 +250,7 @@
       <div class="services-grid">
         <article class="service-card">
           <a href="./hizmetlerimiz/dikey-bahce-tasarimi/index.html" class="service-card__thumb" tabindex="-1" aria-hidden="true">
-            <div class="img-slot"><img src="./assets/img/hizmetler/dikey-bahce-tasarimi-kapak.webp" alt="Dikey Bahçe Tasarımı" loading="lazy"></div>
+            <div class="img-slot"><img src="./assets/img/hizmetler/dikey-bahce-tasarimi-kapak.webp" alt="Dikey Bahçe Tasarımı" loading="lazy" width="960" height="720" decoding="async"></div>
           </a>
           <div class="service-card__body">
             <h3 class="service-card__title"><a href="./hizmetlerimiz/dikey-bahce-tasarimi/index.html">Dikey Bahçe Tasarımı</a></h3>
@@ -267,7 +262,7 @@
         </article>
         <article class="service-card">
           <a href="./hizmetlerimiz/yosun-duvar/index.html" class="service-card__thumb" tabindex="-1" aria-hidden="true">
-            <div class="img-slot"><img src="./assets/img/hizmetler/yosun-duvar-kapak.webp" alt="Yosun Duvar" loading="lazy"></div>
+            <div class="img-slot"><img src="./assets/img/hizmetler/yosun-duvar-kapak.webp" alt="Yosun Duvar" loading="lazy" width="960" height="720" decoding="async"></div>
           </a>
           <div class="service-card__body">
             <h3 class="service-card__title"><a href="./hizmetlerimiz/yosun-duvar/index.html">Yosun Duvar</a></h3>
@@ -279,7 +274,7 @@
         </article>
         <article class="service-card">
           <a href="./hizmetlerimiz/ic-mekan-peyzaj-tasarimi/index.html" class="service-card__thumb" tabindex="-1" aria-hidden="true">
-            <div class="img-slot"><img src="./assets/img/hizmetler/ic-mekan-peyzaj-tasarimi-kapak.webp" alt="İç Mekan Peyzaj Tasarımı" loading="lazy"></div>
+            <div class="img-slot"><img src="./assets/img/hizmetler/ic-mekan-peyzaj-tasarimi-kapak.webp" alt="İç Mekan Peyzaj Tasarımı" loading="lazy" width="960" height="720" decoding="async"></div>
           </a>
           <div class="service-card__body">
             <h3 class="service-card__title"><a href="./hizmetlerimiz/ic-mekan-peyzaj-tasarimi/index.html">İç Mekan Peyzaj Tasarımı</a></h3>
@@ -291,7 +286,7 @@
         </article>
         <article class="service-card">
           <a href="./hizmetlerimiz/bonsai-agac/index.html" class="service-card__thumb" tabindex="-1" aria-hidden="true">
-            <div class="img-slot"><img src="./assets/img/hizmetler/bonsai-agac-kapak.webp" alt="Bonsai Ağaç" loading="lazy"></div>
+            <div class="img-slot"><img src="./assets/img/hizmetler/bonsai-agac-kapak.webp" alt="Bonsai Ağaç" loading="lazy" width="960" height="720" decoding="async"></div>
           </a>
           <div class="service-card__body">
             <h3 class="service-card__title"><a href="./hizmetlerimiz/bonsai-agac/index.html">Bonsai Ağaç</a></h3>
@@ -303,7 +298,7 @@
         </article>
         <article class="service-card">
           <a href="./hizmetlerimiz/el-yapimi-dekoratif-agaclar/index.html" class="service-card__thumb" tabindex="-1" aria-hidden="true">
-            <div class="img-slot"><img src="./assets/img/hizmetler/el-yapimi-dekoratif-agaclar-kapak.webp" alt="El Yapımı Dekoratif Ağaçlar" loading="lazy"></div>
+            <div class="img-slot"><img src="./assets/img/hizmetler/el-yapimi-dekoratif-agaclar-kapak.webp" alt="El Yapımı Dekoratif Ağaçlar" loading="lazy" width="960" height="720" decoding="async"></div>
           </a>
           <div class="service-card__body">
             <h3 class="service-card__title"><a href="./hizmetlerimiz/el-yapimi-dekoratif-agaclar/index.html">El Yapımı Dekoratif Ağaçlar</a></h3>
@@ -315,7 +310,7 @@
         </article>
         <article class="service-card">
           <a href="./hizmetlerimiz/toptan-satis/index.html" class="service-card__thumb" tabindex="-1" aria-hidden="true">
-            <div class="img-slot"><img src="./assets/img/hizmetler/toptan-satis-kapak.webp" alt="Toptan Satış" loading="lazy"></div>
+            <div class="img-slot"><img src="./assets/img/hizmetler/toptan-satis-kapak.webp" alt="Toptan Satış" loading="lazy" width="960" height="720" decoding="async"></div>
           </a>
           <div class="service-card__body">
             <h3 class="service-card__title"><a href="./hizmetlerimiz/toptan-satis/index.html">Toptan Satış</a></h3>
@@ -346,7 +341,7 @@
       <div class="products-grid shop-grid">
         <article class="product-card shop-card" data-cat="yosun" data-price="3500.00" data-order="0">
           <a href="./magaza/yuvarlak-stabilize-yosun-ve-bitki-tablosu-03/index.html" class="product-card__thumb" aria-label="Yuvarlak Stabilize Yosun ve Bitki Tablosu 03 detayları">
-            <div class="img-slot"><img src="./assets/img/magaza/yuvarlak-stabilize-yosun-ve-bitki-tablosu-03.webp" alt="Yuvarlak Stabilize Yosun ve Bitki Tablosu 03" loading="lazy"></div>
+            <div class="img-slot"><img src="./assets/img/magaza/yuvarlak-stabilize-yosun-ve-bitki-tablosu-03.webp" alt="Yuvarlak Stabilize Yosun ve Bitki Tablosu 03" loading="lazy" width="800" height="800" decoding="async"></div>
             <span class="shop-card__more">6 görsel</span>
           </a>
           <div class="product-card__body">
@@ -359,7 +354,7 @@
         </article>
         <article class="product-card shop-card" data-cat="bonsai" data-price="27720.00" data-order="2">
           <a href="./magaza/bonsai-agac-01/index.html" class="product-card__thumb" aria-label="Bonsai Ağaç 01 detayları">
-            <div class="img-slot"><img src="./assets/img/magaza/bonsai-agac-01.webp" alt="Bonsai Ağaç 01" loading="lazy"></div>
+            <div class="img-slot"><img src="./assets/img/magaza/bonsai-agac-01.webp" alt="Bonsai Ağaç 01" loading="lazy" width="800" height="800" decoding="async"></div>
             <span class="shop-card__more">6 görsel</span>
           </a>
           <div class="product-card__body">
@@ -372,7 +367,7 @@
         </article>
         <article class="product-card shop-card" data-cat="yosun" data-price="13850.00" data-order="3">
           <a href="./magaza/dogal-dal-detayli-yosun-tablo/index.html" class="product-card__thumb" aria-label="Doğal Dal Detaylı Yosun Tablo detayları">
-            <div class="img-slot"><img src="./assets/img/magaza/dogal-dal-detayli-yosun-tablo.webp" alt="Doğal Dal Detaylı Yosun Tablo" loading="lazy"></div>
+            <div class="img-slot"><img src="./assets/img/magaza/dogal-dal-detayli-yosun-tablo.webp" alt="Doğal Dal Detaylı Yosun Tablo" loading="lazy" width="800" height="800" decoding="async"></div>
             <span class="shop-card__more">6 görsel</span>
           </a>
           <div class="product-card__body">
@@ -385,7 +380,7 @@
         </article>
         <article class="product-card shop-card" data-cat="set" data-price="17450.00" data-order="15">
           <a href="./magaza/kare-botanik-yosun-tablo-3lu-set/index.html" class="product-card__thumb" aria-label="Kare Botanik Yosun Tablo-3’lü Set detayları">
-            <div class="img-slot"><img src="./assets/img/magaza/kare-botanik-yosun-tablo-3lu-set.webp" alt="Kare Botanik Yosun Tablo-3’lü Set" loading="lazy"></div>
+            <div class="img-slot"><img src="./assets/img/magaza/kare-botanik-yosun-tablo-3lu-set.webp" alt="Kare Botanik Yosun Tablo-3’lü Set" loading="lazy" width="800" height="800" decoding="async"></div>
             <span class="shop-card__more">6 görsel</span>
           </a>
           <div class="product-card__body">
@@ -454,10 +449,7 @@
     <div class="container">
       <div class="split-section">
         <a href="./hizmetlerimiz/yosun-duvar/index.html" class="split-section__visual" tabindex="-1" aria-hidden="true">
-          <picture>
-            <source srcset="assets/img/kurumsal-ofis-yosun-duvar.webp" type="image/webp">
-            <img src="assets/img/kurumsal-ofis-yosun-duvar.webp" alt="Butik lüks ofis lobisinde mimari yosun duvar uygulaması" width="1200" height="800" loading="lazy">
-          </picture>
+          <img src="assets/img/kurumsal-ofis-yosun-duvar.webp" alt="Butik lüks ofis lobisinde mimari yosun duvar uygulaması" width="960" height="644" loading="lazy" decoding="async">
         </a>
 
         <div>
@@ -499,10 +491,7 @@
     <div class="container">
       <div class="split-section" style="direction: rtl;">
         <a href="./hakkimizda/index.html" class="split-section__visual" style="direction: ltr;" tabindex="-1" aria-hidden="true">
-          <picture>
-            <source srcset="assets/img/doga-dag-ormani-yosun.webp" type="image/webp">
-            <img src="assets/img/doga-dag-ormani-yosun.webp" alt="Sisli dağ ormanında kayalar üzerinde doğal dağ yosunu" width="1200" height="675" loading="lazy">
-          </picture>
+          <img src="assets/img/doga-dag-ormani-yosun.webp" alt="Sisli dağ ormanında kayalar üzerinde doğal dağ yosunu" width="960" height="536" loading="lazy" decoding="async">
         </a>
 
         <div style="direction: ltr;">
@@ -536,10 +525,7 @@
       <div class="blog-grid">
         <article class="blog-card">
           <a href="./blog/stabilize-yosun-nedir/index.html" class="blog-card__thumb" tabindex="-1" aria-hidden="true">
-            <picture>
-              <source srcset="assets/img/makro-yosun-dokusu.webp" type="image/webp">
-              <img src="assets/img/makro-yosun-dokusu.webp" alt="Stabilize yosun dokusu makro çekim" width="600" height="400" loading="lazy">
-            </picture>
+            <img src="assets/img/makro-yosun-dokusu.webp" alt="Stabilize yosun dokusu makro çekim" width="960" height="644" loading="lazy" decoding="async">
           </a>
           <div class="blog-card__body">
             <div class="blog-card__meta">
@@ -555,10 +541,7 @@
 
         <article class="blog-card">
           <a href="./blog/yosun-duvar-bakimi/index.html" class="blog-card__thumb" tabindex="-1" aria-hidden="true">
-            <picture>
-              <source srcset="assets/img/hero-stabilize-yosun-duvar.webp" type="image/webp">
-              <img src="assets/img/hero-stabilize-yosun-duvar.webp" alt="Yosun duvar bakımı püf noktaları" width="600" height="400" loading="lazy">
-            </picture>
+            <img src="assets/img/hero-stabilize-yosun-duvar.webp" alt="Yosun duvar bakımı püf noktaları" width="1280" height="714" loading="lazy" decoding="async">
           </a>
           <div class="blog-card__body">
             <div class="blog-card__meta">
@@ -574,10 +557,7 @@
 
         <article class="blog-card">
           <a href="./blog/ofis-icin-yosun-duvar/index.html" class="blog-card__thumb" tabindex="-1" aria-hidden="true">
-            <picture>
-              <source srcset="assets/img/kurumsal-ofis-yosun-duvar.webp" type="image/webp">
-              <img src="assets/img/kurumsal-ofis-yosun-duvar.webp" alt="Ofis için yosun duvar çözümleri" width="600" height="400" loading="lazy">
-            </picture>
+            <img src="assets/img/kurumsal-ofis-yosun-duvar.webp" alt="Ofis için yosun duvar çözümleri" width="960" height="644" loading="lazy" decoding="async">
           </a>
           <div class="blog-card__body">
             <div class="blog-card__meta">

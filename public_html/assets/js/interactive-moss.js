@@ -21,10 +21,12 @@
     const container = canvas.parentElement;
     const badge = document.getElementById('moss-hint-badge');
 
-    // WebGL Context
+    // WebGL Context (2D Quad için antialias/depth/stencil kapalı -> maksimum FPS, sıfır kasma)
     const gl = canvas.getContext('webgl', {
       alpha: true,
-      antialias: true,
+      antialias: false,
+      depth: false,
+      stencil: false,
       premultipliedAlpha: false,
       powerPreference: 'high-performance'
     }) || canvas.getContext('experimental-webgl');
@@ -48,7 +50,7 @@
 
     // Fragment Shader: 3D Kabarma, Sağa-Sola Yönelme ve Işık
     const fsSource = `
-      precision highp float;
+      precision mediump float;
       varying vec2 vUv;
 
       uniform sampler2D uTexture;     // Yosun & Çerçeve Görseli
@@ -73,11 +75,10 @@
         return texture2D(uDepth, p).r;
       }
 
-      // Parallax Occlusion Mapping: bakış ışını katman katman ilerler, ilk çarptığı yüzeyi bulur.
-      // Böylece öndeki yosun topları arkadakileri örter, çerçeve kenarı içteki yosunu gizler.
+      // Parallax Occlusion Mapping: optimize edilmiş 10 adım + doğrusal ara değerleme
       vec2 parallaxUv(vec2 uv) {
         vec2 dir = uTilt * uDepthScale * vec2(1.0, 1.0 / uAspect);
-        const int STEPS = 24;
+        const int STEPS = 10;
         float dl = 1.0 / float(STEPS);
         float layer = 1.0;
         vec2 p = uv;
@@ -299,16 +300,11 @@
           console.warn('Doku WebGL aktarım uyarısı:', err);
         }
       };
-      image.onerror = function () {
-        if (url.indexOf('data:') !== 0 && image.src.endsWith('.webp')) {
-          image.src = url.replace('.webp', unit === 0 ? '.jpg' : '.png');
-        }
-      };
       image.src = url;
       return texture;
     }
 
-    // Görselleri Bağla (Modern WebP, destek yoksa JPG/PNG)
+    // Görselleri Bağla (Tamamı Optimize WebP)
     function loadAllTextures(t) {
       loadTexture(gl, t.color, 0);
       loadTexture(gl, t.mask, 1);
@@ -320,7 +316,7 @@
       // Dosyaya çift tıklanarak açıldığında tarayıcı yerel görselleri WebGL'e vermez (güvenlik).
       // Bu durumda dokular gömülü veri (data URI) olarak ayrı bir dosyadan yüklenir.
       const s = document.createElement('script');
-      s.src = 'assets/js/hero-moss-textures.js?v=3';
+      s.src = 'assets/js/hero-moss-textures.js?v=4';
       s.onload = function () {
         if (window.ELIVA_MOSS_TEXTURES) loadAllTextures(window.ELIVA_MOSS_TEXTURES);
       };
@@ -366,22 +362,37 @@
     const STIFFNESS = 0.22;
     const DAMPING = 0.76;
 
-    // Boyutlandırma (Responsive Retina & Mobil)
+    // Önbelleğe alınmış (cached) koordinat kutusu — mousemove/touchmove sırasında reflow tetiklemez
+    let cachedRect = { left: 0, top: 0, width: 400, height: 600 };
+    let winHalfW = Math.max((window.innerWidth || 1024) * 0.5, 1);
+    let winHalfH = Math.max((window.innerHeight || 768) * 0.5, 1);
+
+    function updateCachedRect() {
+      const r = container.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) {
+        cachedRect = { left: r.left, top: r.top, width: r.width, height: r.height };
+      }
+      winHalfW = Math.max((window.innerWidth || 1024) * 0.5, 1);
+      winHalfH = Math.max((window.innerHeight || 768) * 0.5, 1);
+    }
+
+    // Boyutlandırma (Responsive Retina & Mobil — sıfır kasma için DPR maks 1.35)
     function resizeCanvas() {
-      const rect = container.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2); // Mobilde pil ve hız için maks 2
-      const width = Math.round(rect.width * dpr);
-      const height = Math.round(rect.height * dpr);
+      updateCachedRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, isTouchDevice ? 1.15 : 1.35);
+      const width = Math.round(cachedRect.width * dpr);
+      const height = Math.round(cachedRect.height * dpr);
 
       if (width > 0 && height > 0 && (canvas.width !== width || canvas.height !== height)) {
         canvas.width = width;
         canvas.height = height;
         gl.viewport(0, 0, width, height);
-        if (rect.width > 0) gl.uniform1f(uAspectLoc, rect.height / rect.width);
+        if (cachedRect.width > 0) gl.uniform1f(uAspectLoc, cachedRect.height / cachedRect.width);
       }
     }
 
     window.addEventListener('resize', resizeCanvas, { passive: true });
+    window.addEventListener('scroll', updateCachedRect, { passive: true });
     if ('ResizeObserver' in window) {
       new ResizeObserver(resizeCanvas).observe(container);
     }
@@ -389,9 +400,8 @@
 
     // Koordinat Dönüştürücü (Client Pixel -> UV 0..1)
     function getUV(clientX, clientY) {
-      const rect = canvas.getBoundingClientRect();
-      const x = (clientX - rect.left) / rect.width;
-      const y = (clientY - rect.top) / rect.height;
+      const x = (clientX - cachedRect.left) / (cachedRect.width || 1);
+      const y = (clientY - cachedRect.top) / (cachedRect.height || 1);
       return {
         x: Math.max(0.0, Math.min(1.0, x)),
         y: Math.max(0.0, Math.min(1.0, y))
@@ -405,16 +415,13 @@
       }
     }
 
-    // --- DERİNLİK: FARE KONUMU (Masaüstü — sayfanın her yerinden) ---
+    // --- DERİNLİK: FARE KONUMU (Masaüstü — sıfır layout reflow) ---
     window.addEventListener('mousemove', function (e) {
       if (isTouchDevice) return;
-      const rect = container.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const rx = Math.max(window.innerWidth * 0.5, 1);
-      const ry = Math.max(window.innerHeight * 0.5, 1);
-      targetTiltX = Math.max(-1, Math.min(1, (e.clientX - cx) / rx));
-      targetTiltY = Math.max(-1, Math.min(1, (e.clientY - cy) / ry));
+      const cx = cachedRect.left + cachedRect.width * 0.5;
+      const cy = cachedRect.top + cachedRect.height * 0.5;
+      targetTiltX = Math.max(-1, Math.min(1, (e.clientX - cx) / winHalfW));
+      targetTiltY = Math.max(-1, Math.min(1, (e.clientY - cy) / winHalfH));
       lastTiltInputTime = performance.now();
     }, { passive: true });
 
