@@ -21,12 +21,10 @@
     const container = canvas.parentElement;
     const badge = document.getElementById('moss-hint-badge');
 
-    // WebGL Context (2D Quad için antialias/depth/stencil kapalı -> maksimum FPS, sıfır kasma)
+    // WebGL Context
     const gl = canvas.getContext('webgl', {
       alpha: true,
-      antialias: false,
-      depth: false,
-      stencil: false,
+      antialias: true,
       premultipliedAlpha: false,
       powerPreference: 'high-performance'
     }) || canvas.getContext('experimental-webgl');
@@ -50,7 +48,7 @@
 
     // Fragment Shader: 3D Kabarma, Sağa-Sola Yönelme ve Işık
     const fsSource = `
-      precision mediump float;
+      precision highp float;
       varying vec2 vUv;
 
       uniform sampler2D uTexture;     // Yosun & Çerçeve Görseli
@@ -75,10 +73,11 @@
         return texture2D(uDepth, p).r;
       }
 
-      // Parallax Occlusion Mapping: optimize edilmiş 10 adım + doğrusal ara değerleme
+      // Parallax Occlusion Mapping: bakış ışını katman katman ilerler, ilk çarptığı yüzeyi bulur.
+      // Böylece öndeki yosun topları arkadakileri örter, çerçeve kenarı içteki yosunu gizler.
       vec2 parallaxUv(vec2 uv) {
         vec2 dir = uTilt * uDepthScale * vec2(1.0, 1.0 / uAspect);
-        const int STEPS = 10;
+        const int STEPS = 24;
         float dl = 1.0 / float(STEPS);
         float layer = 1.0;
         vec2 p = uv;
@@ -105,6 +104,13 @@
       void main() {
         vec2 uv = vUv;
 
+        // Pirinç çerçeve alanı (!insideFrame): KESİNLİKLE sabit kalır, hiçbir deformasyon veya parallax uygulanmaz!
+        bool insideFrame = all(greaterThan(uv, uFrame.xy)) && all(lessThan(uv, uFrame.zw));
+        if (!insideFrame) {
+          gl_FragColor = texture2D(uTexture, uv);
+          return;
+        }
+
         // Maske: Çerçeve alanı 0.0, yosun alanları 0.3 - 1.0
         float mask = texture2D(uMask, uv).r;
 
@@ -122,8 +128,13 @@
           influence = dome * dome;
         }
 
+        // Çerçeve iç kenarına yaklaşırken kabarmayı yumuşakça sönümle (kenarda sıfır bozulma)
+        float edgeDistX = min(uv.x - uFrame.x, uFrame.z - uv.x);
+        float edgeDistY = min(uv.y - uFrame.y, uFrame.w - uv.y) * uAspect;
+        float edgeFade = smoothstep(0.0, 0.032, min(edgeDistX, edgeDistY));
+
         // SADECE yosunlar kabarır, çerçeve kesinlikle kabarmasın!
-        float bulgeFactor = influence * uBulge * mask;
+        float bulgeFactor = influence * uBulge * mask * edgeFade;
 
         // 3. İmlecin ucunda doğal dışa doğru 3D kabarma (Merkezde tekillik/kırılma/sarmal yapmaz)
         vec2 bulgeOffset = -delta * (bulgeFactor * 0.28);
@@ -131,17 +142,13 @@
         // 4. Doğal hafif yatma (Sarmal/dönme yok, sadece anlık meyil)
         vec2 dragOffset = -uVelocity * (bulgeFactor * 0.12);
 
-        // Toplam Deformasyon
-        vec2 displacedUv = uv + bulgeOffset + dragOffset;
-        displacedUv = clamp(displacedUv, 0.001, 0.999);
+        // Toplam Deformasyon (güvenli iç alanda tut)
+        vec2 displacedUv = clamp(uv + bulgeOffset + dragOffset, uInner.xy, uInner.zw);
 
         // 4b. Gerçek derinlik: bakış açısına göre katmanlar farklı hızda kayar.
         // Yosun fotoğrafı çerçevenin altına taşacak kadar hafif büyütülür: en uç açıda bile kenarda boşluk kalmaz.
-        bool insideFrame = all(greaterThan(uv, uFrame.xy)) && all(lessThan(uv, uFrame.zw));
-        if (insideFrame) {
-          displacedUv = vec2(0.5) + (displacedUv - vec2(0.5)) * 0.885;
-        }
-        displacedUv = clamp(parallaxUv(displacedUv), 0.001, 0.999);
+        displacedUv = vec2(0.5) + (displacedUv - vec2(0.5)) * 0.885;
+        displacedUv = clamp(parallaxUv(displacedUv), uInner.xy, uInner.zw);
         float h = heightAt(displacedUv);
 
         // Ana Doku Örnekleme
@@ -304,7 +311,7 @@
       return texture;
     }
 
-    // Görselleri Bağla (Tamamı Optimize WebP)
+    // Görselleri Bağla (Tamamı Kayıpsız/Optimize WebP)
     function loadAllTextures(t) {
       loadTexture(gl, t.color, 0);
       loadTexture(gl, t.mask, 1);
@@ -316,17 +323,17 @@
       // Dosyaya çift tıklanarak açıldığında tarayıcı yerel görselleri WebGL'e vermez (güvenlik).
       // Bu durumda dokular gömülü veri (data URI) olarak ayrı bir dosyadan yüklenir.
       const s = document.createElement('script');
-      s.src = 'assets/js/hero-moss-textures.js?v=4';
+      s.src = 'assets/js/hero-moss-textures.js?v=20261013b';
       s.onload = function () {
         if (window.ELIVA_MOSS_TEXTURES) loadAllTextures(window.ELIVA_MOSS_TEXTURES);
       };
       document.head.appendChild(s);
     } else {
       loadAllTextures({
-        color: 'assets/img/hero-moss-tall.webp',
-        mask: 'assets/img/hero-moss-tall-mask.webp',
-        normal: 'assets/img/hero-moss-tall-normal.webp',
-        depth: 'assets/img/hero-moss-tall-depth.webp'
+        color: 'assets/img/hero-moss-tall.webp?v=20261013b',
+        mask: 'assets/img/hero-moss-tall-mask.webp?v=20261013b',
+        normal: 'assets/img/hero-moss-tall-normal.webp?v=20261013b',
+        depth: 'assets/img/hero-moss-tall-depth.webp?v=20261013b'
       });
     }
 
@@ -362,37 +369,22 @@
     const STIFFNESS = 0.22;
     const DAMPING = 0.76;
 
-    // Önbelleğe alınmış (cached) koordinat kutusu — mousemove/touchmove sırasında reflow tetiklemez
-    let cachedRect = { left: 0, top: 0, width: 400, height: 600 };
-    let winHalfW = Math.max((window.innerWidth || 1024) * 0.5, 1);
-    let winHalfH = Math.max((window.innerHeight || 768) * 0.5, 1);
-
-    function updateCachedRect() {
-      const r = container.getBoundingClientRect();
-      if (r.width > 0 && r.height > 0) {
-        cachedRect = { left: r.left, top: r.top, width: r.width, height: r.height };
-      }
-      winHalfW = Math.max((window.innerWidth || 1024) * 0.5, 1);
-      winHalfH = Math.max((window.innerHeight || 768) * 0.5, 1);
-    }
-
-    // Boyutlandırma (Responsive Retina & Mobil — sıfır kasma için DPR maks 1.35)
+    // Boyutlandırma (Responsive Retina & Mobil)
     function resizeCanvas() {
-      updateCachedRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, isTouchDevice ? 1.15 : 1.35);
-      const width = Math.round(cachedRect.width * dpr);
-      const height = Math.round(cachedRect.height * dpr);
+      const rect = container.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2); // Mobilde pil ve hız için maks 2
+      const width = Math.round(rect.width * dpr);
+      const height = Math.round(rect.height * dpr);
 
       if (width > 0 && height > 0 && (canvas.width !== width || canvas.height !== height)) {
         canvas.width = width;
         canvas.height = height;
         gl.viewport(0, 0, width, height);
-        if (cachedRect.width > 0) gl.uniform1f(uAspectLoc, cachedRect.height / cachedRect.width);
+        if (rect.width > 0) gl.uniform1f(uAspectLoc, rect.height / rect.width);
       }
     }
 
     window.addEventListener('resize', resizeCanvas, { passive: true });
-    window.addEventListener('scroll', updateCachedRect, { passive: true });
     if ('ResizeObserver' in window) {
       new ResizeObserver(resizeCanvas).observe(container);
     }
@@ -400,8 +392,9 @@
 
     // Koordinat Dönüştürücü (Client Pixel -> UV 0..1)
     function getUV(clientX, clientY) {
-      const x = (clientX - cachedRect.left) / (cachedRect.width || 1);
-      const y = (clientY - cachedRect.top) / (cachedRect.height || 1);
+      const rect = canvas.getBoundingClientRect();
+      const x = (clientX - rect.left) / rect.width;
+      const y = (clientY - rect.top) / rect.height;
       return {
         x: Math.max(0.0, Math.min(1.0, x)),
         y: Math.max(0.0, Math.min(1.0, y))
@@ -415,13 +408,16 @@
       }
     }
 
-    // --- DERİNLİK: FARE KONUMU (Masaüstü — sıfır layout reflow) ---
+    // --- DERİNLİK: FARE KONUMU (Masaüstü — sayfanın her yerinden) ---
     window.addEventListener('mousemove', function (e) {
       if (isTouchDevice) return;
-      const cx = cachedRect.left + cachedRect.width * 0.5;
-      const cy = cachedRect.top + cachedRect.height * 0.5;
-      targetTiltX = Math.max(-1, Math.min(1, (e.clientX - cx) / winHalfW));
-      targetTiltY = Math.max(-1, Math.min(1, (e.clientY - cy) / winHalfH));
+      const rect = container.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const rx = Math.max(window.innerWidth * 0.5, 1);
+      const ry = Math.max(window.innerHeight * 0.5, 1);
+      targetTiltX = Math.max(-1, Math.min(1, (e.clientX - cx) / rx));
+      targetTiltY = Math.max(-1, Math.min(1, (e.clientY - cy) / ry));
       lastTiltInputTime = performance.now();
     }, { passive: true });
 
