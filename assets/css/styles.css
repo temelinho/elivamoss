@@ -677,6 +677,21 @@ p {
   color: var(--color-bg-white);
 }
 
+.logo__img {
+  display: block;
+  height: 54px;
+  width: auto;
+  transition: height 0.3s ease;
+}
+
+.site-header.scrolled .logo__img { height: 46px; }
+.footer-brand .logo__img { height: 60px; }
+
+@media (max-width: 768px) {
+  .logo__img,
+  .site-header.scrolled .logo__img { height: 40px; }
+}
+
 .logo__sub {
   font-size: 0.65rem;
   font-weight: 500;
