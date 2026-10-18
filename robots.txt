@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /public_html/
 
 # Site Haritası
 Sitemap: https://elivamoss.com.tr/sitemap.xml
