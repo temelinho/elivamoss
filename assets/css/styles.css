@@ -2014,7 +2014,7 @@ p {
 @media (max-width: 768px) {
   .hero {
     min-height: 100svh;
-    padding-top: 5rem;
+    padding-top: 7rem; /* sabit header (~88px) altında kalmasın */
     padding-bottom: 2.25rem;
     display: flex;
     align-items: center;
@@ -2925,4 +2925,90 @@ a.service-card__thumb:hover img { transform: scale(1.04); }
 .site-footer {
   content-visibility: auto;
   contain-intrinsic-size: auto 500px;
+}
+
+
+/* ==============================================================
+   MAĞAZA KARTI GÖRSEL KAYDIRICI
+   ============================================================== */
+.card-slider { position: relative; }
+.img-slot .card-slider__track { position: relative; z-index: 1; }
+.card-slider__track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.card-slider__track::-webkit-scrollbar { display: none; }
+.card-slider__track.is-dragging { scroll-snap-type: none; cursor: grabbing; }
+.card-slider__track img,
+.img-slot .card-slider__track img {
+  position: relative;
+  inset: auto;
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scroll-snap-align: start;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.product-card:hover .card-slider__track img { transform: none; }
+
+.card-slider__btn {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  margin-top: -17px;
+  border-radius: 50%;
+  border: 1px solid rgba(176, 141, 87, 0.35);
+  background: rgba(250, 247, 240, 0.92);
+  color: var(--color-primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease, background-color 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.card-slider__btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.card-slider__btn--prev { left: 0.6rem; }
+.card-slider__btn--next { right: 0.6rem; }
+.card-slider:hover .card-slider__btn,
+.card-slider__btn:focus-visible { opacity: 1; }
+.card-slider__btn:hover { background: #FFFFFF; transform: scale(1.06); }
+.card-slider__btn:disabled { opacity: 0 !important; pointer-events: none; }
+
+.card-slider__dots {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 0.7rem;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  pointer-events: none;
+}
+.card-slider__dots span {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.35);
+  transition: background-color 0.25s ease, width 0.25s ease;
+}
+.card-slider__dots span.active { background: #FFFFFF; width: 16px; border-radius: 99px; }
+.card-slider .card-slider__count { left: auto; right: 0.6rem; top: 0.6rem; bottom: auto; }
+
+/* Dokunmatik cihazlarda oklar hep görünür, daha küçük */
+@media (hover: none) {
+  .card-slider__btn { opacity: 0.9; width: 28px; height: 28px; margin-top: -14px; }
+  .card-slider__btn svg { width: 14px; height: 14px; }
 }
