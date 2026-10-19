@@ -228,6 +228,14 @@ function initProductLightbox() {
   const stage = document.querySelector('.pgallery__stage');
   if (!stage) return;
 
+  const lang = (document.documentElement.lang || 'tr').slice(0, 2);
+  const L10N = {
+    tr: { zoom: 'Görsel Yakınlaştırma', close: 'Kapat', detail: 'Ürün Detayı' },
+    en: { zoom: 'Image zoom', close: 'Close', detail: 'Product detail' },
+    ru: { zoom: 'Увеличение изображения', close: 'Закрыть', detail: 'Деталь товара' }
+  };
+  const t = L10N[lang] || L10N.tr;
+
   let lightbox = document.getElementById('pgalleryLightbox');
   if (!lightbox) {
     lightbox = document.createElement('div');
@@ -235,12 +243,12 @@ function initProductLightbox() {
     lightbox.className = 'pgallery-lightbox';
     lightbox.setAttribute('role', 'dialog');
     lightbox.setAttribute('aria-modal', 'true');
-    lightbox.setAttribute('aria-label', 'Görsel Yakınlaştırma');
+    lightbox.setAttribute('aria-label', t.zoom);
     lightbox.innerHTML = `
       <div class="pgallery-lightbox__backdrop"></div>
       <div class="pgallery-lightbox__dialog">
-        <button class="pgallery-lightbox__close" aria-label="Kapat">&times;</button>
-        <img class="pgallery-lightbox__img" src="" alt="Ürün Detayı" />
+        <button class="pgallery-lightbox__close" aria-label="${t.close}">&times;</button>
+        <img class="pgallery-lightbox__img" src="" alt="${t.detail}" />
         <p class="pgallery-lightbox__caption"></p>
       </div>
     `;
@@ -270,7 +278,7 @@ function initProductLightbox() {
     const imgEl = lightbox.querySelector('.pgallery-lightbox__img');
     const capEl = lightbox.querySelector('.pgallery-lightbox__caption');
     imgEl.src = activeSlide.currentSrc || activeSlide.src;
-    imgEl.alt = activeSlide.alt || 'Ürün Detayı';
+    imgEl.alt = activeSlide.alt || t.detail;
     if (capEl) capEl.textContent = activeSlide.alt || '';
     lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';

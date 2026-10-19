@@ -3012,3 +3012,69 @@ a.service-card__thumb:hover img { transform: scale(1.04); }
   .card-slider__btn { opacity: 0.9; width: 28px; height: 28px; margin-top: -14px; }
   .card-slider__btn svg { width: 14px; height: 14px; }
 }
+
+
+/* ==========================================================================
+   DİL SEÇİCİ (TR / EN / RU)
+   ========================================================================== */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 99px;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.lang-switch a {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.72);
+  padding: 0.42rem 0.55rem;
+  border-radius: 99px;
+  transition: var(--transition-smooth);
+}
+
+.lang-switch a:hover {
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.lang-switch a[aria-current="true"] {
+  color: #FFFFFF;
+  background-color: var(--color-accent-brass);
+}
+
+@media (max-width: 400px) {
+  .lang-switch a { padding: 0.38rem 0.42rem; font-size: 0.68rem; }
+  .site-header .container { gap: 0.6rem; }
+}
+
+/* Dil seçici eklendiği için: geniş olmayan masaüstlerinde WhatsApp butonu ikon */
+@media (max-width: 1640px) and (min-width: 961px) {
+  .header-actions .btn-whatsapp {
+    font-size: 0;
+    gap: 0;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+/* Rusça uzun kelimeler: mobilde başlık taşmasını önle */
+html[lang="ru"] h1,
+html[lang="ru"] h2 {
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+@media (max-width: 600px) {
+  html[lang="ru"] h1 {
+    font-size: clamp(1.9rem, 8.4vw, 2.75rem);
+  }
+}
