@@ -3078,3 +3078,17 @@ html[lang="ru"] h2 {
     font-size: clamp(1.9rem, 8.4vw, 2.75rem);
   }
 }
+
+
+/* ==============================================================
+   YASAL SAYFA: bölüm bağlantıları ve tablolar
+   ============================================================== */
+main article[id] { scroll-margin-top: 7rem; }
+main article table a, main article p a, main article li a { color: var(--color-accent-brass); text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 600px) {
+  main article[id] { padding: 1.5rem !important; }
+  main article table th,
+  main article table td { display: block; width: 100% !important; }
+  main article table th { border-bottom: none !important; padding-bottom: 0.15rem !important; }
+  main article table td { padding-top: 0 !important; }
+}
