@@ -31,6 +31,7 @@
     "@context": "https://schema.org",
     "@type": "Product",
     "name": "Round Framed Moss Wall Art 02",
+    "sku": "ELV-YUVARLAK-CERCEVELI-YOSUN-TABLO-02",
     "image": [
       "https://elivamoss.com.tr/assets/img/magaza/yuvarlak-cerceveli-yosun-tablo-02.webp",
       "https://elivamoss.com.tr/assets/img/magaza/yuvarlak-cerceveli-yosun-tablo-02-2.webp",
@@ -50,6 +51,12 @@
       "priceCurrency": "TRY",
       "price": "3500.00",
       "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition",
+      "seller": {
+        "@type": "Organization",
+        "name": "Eliva Moss",
+        "url": "https://elivamoss.com.tr/"
+      },
       "shippingDetails": {
         "@type": "OfferShippingDetails",
         "shippingRate": {
@@ -60,6 +67,21 @@
         "shippingDestination": {
           "@type": "DefinedRegion",
           "addressCountry": "TR"
+        },
+        "deliveryTime": {
+          "@type": "ShippingDeliveryTime",
+          "handlingTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 1,
+            "maxValue": 3,
+            "unitCode": "DAY"
+          },
+          "transitTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 2,
+            "maxValue": 4,
+            "unitCode": "DAY"
+          }
         }
       },
       "hasMerchantReturnPolicy": {
@@ -68,7 +90,8 @@
         "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
         "merchantReturnDays": 14,
         "returnMethod": "https://schema.org/ReturnByMail",
-        "returnFees": "https://schema.org/ReturnFeesCustomerResponsibility"
+        "returnFees": "https://schema.org/ReturnFeesCustomerResponsibility",
+        "merchantReturnLink": "https://elivamoss.com.tr/yasal/#teslimat"
       }
     }
   }
