@@ -2816,7 +2816,7 @@ p {
   letter-spacing: 0.03em;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   .pgallery { position: static; }
 }
 @media (max-width: 768px) {
