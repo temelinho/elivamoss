@@ -31,6 +31,7 @@
   "@context": "https://schema.org",
   "@type": "Product",
   "name": "Akçaağaç Bonsai",
+  "sku": "ELV-AKCAAGAC-BONSAI",
   "image": [
     "https://elivamoss.com.tr/assets/img/magaza/akcaagac-bonsai.webp",
     "https://elivamoss.com.tr/assets/img/magaza/akcaagac-bonsai-2.webp",
@@ -50,7 +51,48 @@
     "url": "https://elivamoss.com.tr/magaza/akcaagac-bonsai/",
     "priceCurrency": "TRY",
     "price": "11500.00",
-    "availability": "https://schema.org/InStock"
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition",
+    "seller": {
+      "@type": "Organization",
+      "name": "Eliva Moss",
+      "url": "https://elivamoss.com.tr/"
+    },
+    "shippingDetails": {
+      "@type": "OfferShippingDetails",
+      "shippingRate": {
+        "@type": "MonetaryAmount",
+        "value": "0",
+        "currency": "TRY"
+      },
+      "shippingDestination": {
+        "@type": "DefinedRegion",
+        "addressCountry": "TR"
+      },
+      "deliveryTime": {
+        "@type": "ShippingDeliveryTime",
+        "handlingTime": {
+          "@type": "QuantitativeValue",
+          "minValue": 1,
+          "maxValue": 3,
+          "unitCode": "DAY"
+        },
+        "transitTime": {
+          "@type": "QuantitativeValue",
+          "minValue": 2,
+          "maxValue": 4,
+          "unitCode": "DAY"
+        }
+      }
+    },
+    "hasMerchantReturnPolicy": {
+      "@type": "MerchantReturnPolicy",
+      "applicableCountry": "TR",
+      "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+      "merchantReturnDays": 14,
+      "returnMethod": "https://schema.org/ReturnByMail",
+      "merchantReturnLink": "https://elivamoss.com.tr/yasal/#teslimat"
+    }
   }
 }
   </script>
