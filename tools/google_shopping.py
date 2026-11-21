@@ -37,7 +37,7 @@ HREFLANG_TR_RE = re.compile(r'<link rel="alternate" hreflang="tr" href="([^"]+)"
 
 def google_category(tr_slug: str) -> str:
     if "bonsai" in tr_slug:
-        return "Home & Garden > Decor > Artificial Flora"
+        return "Home & Garden > Decor"  # stabilize (doğal) bonsai
     return "Home & Garden > Decor > Artwork"
 
 
@@ -103,7 +103,7 @@ def process_lang(lang: str):
         html = page.read_text(encoding="utf-8")
         tr_url_m = HREFLANG_TR_RE.search(html)
         if not tr_url_m:
-            raise SystemExit(f"hreflang tr yok: {page}")
+            continue  # kategori sayfası vb.
         tr_slug = tr_url_m.group(1).rstrip("/").split("/")[-1]
 
         def repl(m):

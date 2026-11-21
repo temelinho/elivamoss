@@ -3092,3 +3092,16 @@ main article table a, main article p a, main article li a { color: var(--color-a
   main article table th { border-bottom: none !important; padding-bottom: 0.15rem !important; }
   main article table td { padding-top: 0 !important; }
 }
+
+/* ==============================================================
+   SEO: ürün model satırı, kategori bağlantıları ve kategori metni
+   ============================================================== */
+.pdetail__model { margin: -0.5rem 0 1rem; font-size: 0.9rem; color: var(--color-text-muted); letter-spacing: 0.02em; }
+.category-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; margin: 0 0 1.5rem; font-size: 0.95rem; }
+.category-links span { color: var(--color-text-muted); }
+.category-links a { color: var(--color-accent-brass); text-decoration: underline; text-underline-offset: 3px; }
+a.shop-filter { text-decoration: none; display: inline-flex; align-items: center; }
+.category-about { max-width: 840px; margin: 4rem auto 0; }
+.category-about h2 { font-size: var(--text-xl); margin: 2.5rem 0 1rem; }
+.category-about h2:first-child { margin-top: 0; }
+.category-about p { line-height: 1.8; margin-bottom: 1rem; color: var(--color-text-main); }
